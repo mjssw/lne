@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LNE", "lne\LNE_vc10.vcxproj", "{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test_vc10.vcxproj", "{B45EE52A-A179-451B-8BA8-DA2E69DCE49B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594} = {7B86A70A-22B0-49D1-BF1E-EFBCFF026594}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}.Debug|Win32.Build.0 = Debug|Win32
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}.Release|Win32.ActiveCfg = Release|Win32
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}.Release|Win32.Build.0 = Release|Win32
+		{B45EE52A-A179-451B-8BA8-DA2E69DCE49B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B45EE52A-A179-451B-8BA8-DA2E69DCE49B}.Debug|Win32.Build.0 = Debug|Win32
+		{B45EE52A-A179-451B-8BA8-DA2E69DCE49B}.Release|Win32.ActiveCfg = Release|Win32
+		{B45EE52A-A179-451B-8BA8-DA2E69DCE49B}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

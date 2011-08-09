@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="config-win32.h" />
+    <ClInclude Include="DataBlock.h" />
+    <ClInclude Include="DataBlockPool.h" />
+    <ClInclude Include="lne.h" />
+    <ClInclude Include="ObjectList_T.h" />
+    <ClInclude Include="ObjectQueue_T.h" />
+    <ClInclude Include="ObjectStack_T.h" />
+    <ClInclude Include="SockAcceptor.h" />
+    <ClInclude Include="SockAddr.h" />
+    <ClInclude Include="SockBase.h" />
+    <ClInclude Include="SockConnector.h" />
+    <ClInclude Include="SockPad.h" />
+    <ClInclude Include="SockPoller.h" />
+    <ClInclude Include="SockStream.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="ThreadCondition.h" />
+    <ClInclude Include="ThreadLock.h" />
+    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="ThreadSemaphore.h" />
+    <ClInclude Include="ThreadMutex.h" />
+    <ClInclude Include="TimeValue.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DataBlock.cpp" />
+    <ClCompile Include="DataBlockPool.cpp" />
+    <ClCompile Include="lne.cpp" />
+    <ClCompile Include="SockAcceptor.cpp" />
+    <ClCompile Include="SockAddr.cpp" />
+    <ClCompile Include="SockBase.cpp" />
+    <ClCompile Include="SockConnector.cpp" />
+    <ClCompile Include="SockPad.cpp" />
+    <ClCompile Include="SockPoller.cpp" />
+    <ClCompile Include="SockStream.cpp" />
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="ThreadCondition.cpp" />
+    <ClCompile Include="ThreadMutex.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="ThreadSemaphore.cpp" />
+    <ClCompile Include="TimeValue.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DataBlock.inl" />
+    <None Include="DataBlockPool.inl" />
+    <None Include="ObjectList_T.inl" />
+    <None Include="ObjectQueue_T.inl" />
+    <None Include="ObjectStack_T.inl" />
+    <None Include="SockAcceptor.inl" />
+    <None Include="SockAddr.inl" />
+    <None Include="SockBase.inl" />
+    <None Include="SockConnector.inl" />
+    <None Include="SockPad.inl" />
+    <None Include="SockPoller.inl" />
+    <None Include="SockStream.inl" />
+    <None Include="Thread.inl" />
+    <None Include="ThreadCondition.inl" />
+    <None Include="ThreadMutex.inl" />
+    <None Include="ThreadPool.inl" />
+    <None Include="ThreadSemaphore.inl" />
+    <None Include="TimeValue.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>LNE</RootNamespace>
+    <ProjectName>LNE</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LNE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LNE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
