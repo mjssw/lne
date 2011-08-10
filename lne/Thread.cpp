@@ -20,6 +20,10 @@
 
 LNE_NAMESPACE_USING
 
+Runnable::~Runnable()
+{
+}
+
 Thread::Thread(Runnable *run)
 {
 	initialized_ = false;

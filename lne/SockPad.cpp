@@ -21,6 +21,14 @@
 
 LNE_NAMESPACE_USING
 
+SockHander::~SockHander()
+{
+}
+
+SockManager::~SockManager()
+{
+}
+
 SockPad::SockPad(SockManager *manager, LNE_UINT limit_cache)
 	: manager_(manager), limit_cache_(limit_cache), thread_lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {

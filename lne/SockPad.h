@@ -31,12 +31,18 @@ class SockPad;
 class SockPoller;
 class DataBlockPool;
 
-struct SockHander {
+class LNE_Export SockHander
+{
+public:
+	virtual ~SockHander() = 0;
 	virtual void HandleData(SockPad *client, DataBlock *block) = 0;
 	virtual void HandleShutdown(SockPad *client) = 0;
 };
 
-struct SockManager {
+class LNE_Export SockManager
+{
+public:
+	virtual ~SockManager() = 0;
 	virtual void FreeSock(SockPad *client) = 0;
 };
 

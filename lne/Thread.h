@@ -24,7 +24,9 @@
 
 LNE_NAMESPACE_BEGIN
 
-struct Runnable {
+class LNE_Export Runnable {
+public:
+	virtual ~Runnable() = 0;
 	virtual void Service(void) = 0;
 	virtual void Terminate(void) = 0;
 };
