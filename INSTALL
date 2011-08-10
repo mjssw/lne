@@ -2,13 +2,15 @@
 		Lne installation
 
 Normally you can just do "make" followed by "make install", and that
-will install the git programs in /usr/local/ directory.  If need 
-the release version, add 'RELEASE=y' variables.
+will install the lne files in /usr/ directory (add 'PREFIX=path' 
+variable for other install directory). If need the release version, 
+add 'RELEASE=y' variable. 
 
 	$ make RELEASE=y ;# as yourself
-	# make PREFIX=/usr install ;# as root
+	# make install ;# as root
 
 When you link you programme, you need link the pthread library.
 
 If you use MSVC, you need create config-os.h for youself. the 
 config-os.h only need one line '#define LNE_WIN32'.
+

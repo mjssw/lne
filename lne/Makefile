@@ -19,7 +19,7 @@ CFLAGS += -Wall -fPIC
 LDFLAGS += -shared -pthread
 SONAME = liblne.so
 TARGET = $(SONAME).$(VERSION)
-PREFIX = /usr/local
+PREFIX = /usr
 
 OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
