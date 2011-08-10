@@ -8,4 +8,7 @@ the release version, add 'RELEASE=y' variables.
 	$ make RELEASE=y ;# as yourself
 	# make PREFIX=/usr install ;# as root
 
+When you link you programme, you need link the pthread library.
 
+If you use MSVC, you need create config-os.h for youself. the 
+config-os.h only need one line '#define LNE_WIN32'.
