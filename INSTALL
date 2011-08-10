@@ -1,0 +1,11 @@
+
+		Lne installation
+
+Normally you can just do "make" followed by "make install", and that
+will install the git programs in /usr/local/ directory.  If need 
+the release version, add 'RELEASE=y' variables.
+
+	$ make RELEASE=y ;# as yourself
+	# make PREFIX=/usr install ;# as root
+
+

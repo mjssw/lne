@@ -1,0 +1,8 @@
+C++ Lightweight Network Environment
+
+Windows: IOCP
+Linux:   epoll
+FreeBSD: kqueue
+
+Other platform support need you help!
+
