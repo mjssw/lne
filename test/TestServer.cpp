@@ -9,9 +9,13 @@ public:
 		count_ = 0;
 	}
 	void HandleData(SockPad *client, DataBlock *block) {
+		DataBlock *blocks[2];
 		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
 		printf("[%u] Recv Data: %u\n", index, block->get_size());
-		client->Send(block);
+		blocks[0] = block;
+		blocks[1] = block;
+		client->Send(blocks, 2);
+		block->Release();
 		if(++count_ > 2)
 			client->Shutdown();
 	}

@@ -122,31 +122,60 @@ void SockPad::Clean(void)
 void SockPad::Send(DataBlock *block)
 {
 	LNE_ASSERT2(block != NULL && !block->IsEmpty());
+	bool to_handle = true;
 	// ignore when shutdown
 	shutdown_lock_.Lock();
-	if(shutdown_state_.already || shutdown_state_.query) {
-		block->Release();
-		block = NULL;
-	}
+	if(shutdown_state_.already || shutdown_state_.query)
+		to_handle = false;
 	shutdown_lock_.Unlock();
-	if(block == NULL)
+	if(!to_handle)
 		return;
 	// append to queue
 	send_lock_.Lock();
-	bool query_shutdown = false;
-	if(send_blocks_.Append(block) != LNERR_OK) {
+	if(send_blocks_.Append(block->AddRef()) != LNERR_OK) {
 		block->Release();
-		block = NULL;
-		query_shutdown = true;
+		to_handle = false;
 	} else if(send_blocks_.get_count() > limit_cache_)
-		query_shutdown = true;
-	if(query_shutdown) {
+		to_handle = false;
+	if(!to_handle) {
 		shutdown_lock_.Lock();
 		shutdown_state_.query = true;
 		shutdown_lock_.Unlock();
 	}
 	send_lock_.Unlock();
-	if(block)
+	if(to_handle)
+		__HandleSend();
+}
+
+void SockPad::Send(DataBlock *blocks[], LNE_UINT count)
+{
+	LNE_ASSERT2(blocks != NULL && count > 0);
+	bool to_handle = true;
+	// ignore when shutdown
+	shutdown_lock_.Lock();
+	if(shutdown_state_.already || shutdown_state_.query)
+		to_handle = false;
+	shutdown_lock_.Unlock();
+	if(!to_handle)
+		return;
+	// append to queue
+	DataBlock *block;
+	send_lock_.Lock();
+	for(LNE_UINT i = 0; to_handle && i < count; ++i) {
+		block = blocks[i];
+		if(send_blocks_.Append(block->AddRef()) != LNERR_OK) {
+			block->Release();
+			to_handle = false;
+		} else if(send_blocks_.get_count() > limit_cache_)
+			to_handle = false;
+	}
+	if(!to_handle) {
+		shutdown_lock_.Lock();
+		shutdown_state_.query = true;
+		shutdown_lock_.Unlock();
+	}
+	send_lock_.Unlock();
+	if(to_handle)
 		__HandleSend();
 }
 

@@ -55,6 +55,7 @@ public:
 
 public:
 	void Send(DataBlock *block);
+	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
 	SockHander *get_hander(void);
 	void *get_context(void);
