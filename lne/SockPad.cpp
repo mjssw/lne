@@ -30,11 +30,12 @@ SockManager::~SockManager()
 }
 
 SockPad::SockPad(SockManager *manager, LNE_UINT limit_cache)
-	: manager_(manager), limit_cache_(limit_cache), thread_lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
+	: manager_(manager), limit_cache_(limit_cache), lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {
 	hander_ = NULL;
 	context_ = NULL;
 	thread_count_ = 0;
+	reference_count_ = 0;
 	memset(&send_state_, 0, sizeof(send_state_));
 	memset(&recv_state_, 0, sizeof(recv_state_));
 	memset(&shutdown_state_, 0, sizeof(shutdown_state_));
@@ -60,6 +61,24 @@ SockPad::SockPad(SockManager *manager, LNE_UINT limit_cache)
 
 SockPad::~SockPad(void)
 {
+}
+
+SockPad *SockPad::AddRef(void)
+{
+	lock_.Lock();
+	++reference_count_;
+	lock_.Unlock();
+	return this;
+}
+
+void SockPad::Release(void)
+{
+	bool can_destory = false;
+	lock_.Lock();
+	can_destory = --reference_count_ < 1;
+	lock_.Unlock();
+	if(can_destory)
+		manager_->FreeSock(this);
 }
 
 LNE_UINT SockPad::Apply(void)
@@ -101,6 +120,8 @@ LNE_UINT SockPad::Apply(void)
 	}
 	if(result != LNERR_OK)
 		Clean();
+	else
+		reference_count_ = 1;
 	return result;
 }
 
@@ -476,19 +497,19 @@ void SockPad::__HandleShutdown(void)
 
 void SockPad::EnterThreadSafe(void)
 {
-	thread_lock_.Lock();
+	lock_.Lock();
 	++thread_count_;
-	thread_lock_.Unlock();
+	lock_.Unlock();
 }
 
 void SockPad::LeaveThreadSafe(void)
 {
 	LNE_UINT num_flag = 0;
-	thread_lock_.Lock();
+	lock_.Lock();
 	--thread_count_;
 	if(thread_count_ == 0)
 		++num_flag;
-	thread_lock_.Unlock();
+	lock_.Unlock();
 	shutdown_lock_.Lock();
 	if(shutdown_state_.already)
 		++num_flag;
@@ -496,7 +517,7 @@ void SockPad::LeaveThreadSafe(void)
 	// process shutdown
 	if(num_flag == 2) {
 		hander_->HandleShutdown(this);
-		manager_->FreeSock(this);
+		Release();
 	}
 }
 

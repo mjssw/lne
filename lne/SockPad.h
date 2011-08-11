@@ -60,6 +60,8 @@ public:
 #endif
 
 public:
+	SockPad *AddRef(void);
+	void Release(void);
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
@@ -85,9 +87,9 @@ private:
 	LNE_UINT limit_cache_;
 	SockHander *hander_;
 	void *context_;
-	// for thread safe
+	ThreadLock lock_;
 	LNE_UINT thread_count_;
-	ThreadLock thread_lock_;
+	LNE_UINT reference_count_;
 	// for send
 	struct {
 		bool ready;
