@@ -8,7 +8,7 @@ public:
 	MyHander() {
 		count_ = 0;
 	}
-	void HandleData(SockPad *client, DataBlock *block) {
+	void HandleData(SockSpray *client, DataBlock *block) {
 		DataBlock *blocks[2];
 		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
 		printf("[%u] Recv Data: %u\n", index, block->get_size());
@@ -20,7 +20,7 @@ public:
 			client->Shutdown();
 	}
 
-	void HandleShutdown(SockPad *client) {
+	void HandleShutdown(SockSpray *client) {
 		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
 		printf("[%u] Shutdown\n", index);
 		delete this;

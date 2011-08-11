@@ -202,7 +202,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPad.cpp"
+				RelativePath=".\SockSpray.cpp"
 				>
 			</File>
 			<File
@@ -296,7 +296,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPad.h"
+				RelativePath=".\SockSpray.h"
 				>
 			</File>
 			<File
@@ -382,7 +382,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPad.inl"
+				RelativePath=".\SockSpray.inl"
 				>
 			</File>
 			<File

@@ -27,7 +27,7 @@
 
 LNE_NAMESPACE_BEGIN
 
-class SockPad;
+class SockSpray;
 class SockPoller;
 class DataBlockPool;
 
@@ -35,18 +35,18 @@ class LNE_Export SockHander
 {
 public:
 	virtual ~SockHander() = 0;
-	virtual void HandleData(SockPad *client, DataBlock *block) = 0;
-	virtual void HandleShutdown(SockPad *client) = 0;
+	virtual void HandleData(SockSpray *client, DataBlock *block) = 0;
+	virtual void HandleShutdown(SockSpray *client) = 0;
 };
 
 class LNE_Export SockManager
 {
 public:
 	virtual ~SockManager() = 0;
-	virtual void FreeSock(SockPad *client) = 0;
+	virtual void FreeSock(SockSpray *client) = 0;
 };
 
-class LNE_Export SockPad: public SockBase
+class LNE_Export SockSpray: public SockBase
 {
 	friend class SockPoller;
 public:
@@ -55,12 +55,12 @@ public:
 	typedef struct {
 		WSAOVERLAPPED overlap;
 		DWORD type;
-		SockPad *owner;
+		SockSpray *owner;
 	}	IOCP_OVERLAPPED;
 #endif
 
 public:
-	SockPad *AddRef(void);
+	SockSpray *AddRef(void);
 	void Release(void);
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
@@ -69,8 +69,8 @@ public:
 	void *get_context(void);
 
 private:
-	SockPad(SockManager *manager, LNE_UINT limit_cache);
-	~SockPad(void);
+	SockSpray(SockManager *manager, LNE_UINT limit_cache);
+	~SockSpray(void);
 	LNE_UINT Apply(void);
 	void Clean(void);
 	void __Shutdown(void);
@@ -132,7 +132,7 @@ private:
 #endif
 };
 
-#include "SockPad.inl"
+#include "SockSpray.inl"
 
 LNE_NAMESPACE_END
 

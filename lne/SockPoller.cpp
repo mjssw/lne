@@ -87,7 +87,7 @@ SockPoller::~SockPoller(void)
 #endif
 	if(threads_)
 		free(threads_);
-	SockPad *client;
+	SockSpray *client;
 	while(clients_free_.Pop(client) == LNERR_OK)
 		delete client;
 }
@@ -122,11 +122,11 @@ void SockPoller::Release(void)
 LNE_UINT SockPoller::Managed(SockStream *stream, SockHander *hander, void *context)
 {
 	LNE_ASSERT(stream != NULL && stream->Available() && hander != NULL, LNERR_PARAMETER);
-	SockPad *client  = NULL;
+	SockSpray *client  = NULL;
 	lock_.Lock();
 	if(clients_free_.Pop(client) != LNERR_OK) {
 		try {
-			client = new SockPad(this, limit_cache_);
+			client = new SockSpray(this, limit_cache_);
 		} catch(std::bad_alloc) {
 		}
 	}
@@ -149,7 +149,7 @@ LNE_UINT SockPoller::Managed(SockStream *stream, SockHander *hander, void *conte
 	return result;
 }
 
-void SockPoller::FreeSock(SockPad *client)
+void SockPoller::FreeSock(SockSpray *client)
 {
 	LNE_ASSERT2(client != NULL);
 	client->Clean();
@@ -182,12 +182,12 @@ void SockPoller::Service(void)
 {
 	DWORD bytes;
 	ULONG_PTR key;
-	SockPad::IOCP_OVERLAPPED *overlap;
+	SockSpray::IOCP_OVERLAPPED *overlap;
 	do {
 		if(GetQueuedCompletionStatus(poller_, &bytes, &key, reinterpret_cast<LPOVERLAPPED *>(&overlap), 500)) {
-			if(overlap->type == SockPad::IOCP_RECV)
+			if(overlap->type == SockSpray::IOCP_RECV)
 				overlap->owner->HandleRecv(pool_);
-			else if(overlap->type == SockPad::IOCP_SEND)
+			else if(overlap->type == SockSpray::IOCP_SEND)
 				overlap->owner->HandleSend();
 			else
 				overlap->owner->HandleShutdown();
@@ -198,12 +198,12 @@ void SockPoller::Service(void)
 void SockPoller::Service(void)
 {
 	int rc;
-	SockPad *client;
+	SockSpray *client;
 	struct epoll_event event;
 	do {
 		rc = epoll_wait(poller_, &event, 1, 500);
 		if(rc > 0) {
-			client = reinterpret_cast<SockPad *>(event.data.ptr);
+			client = reinterpret_cast<SockSpray *>(event.data.ptr);
 			if(event.events & EPOLLIN)
 				client->HandleRecv(pool_);
 			if(event.events & EPOLLOUT)
@@ -217,7 +217,7 @@ void SockPoller::Service(void)
 void SockPoller::Service(void)
 {
 	int rc;
-	SockPad *client;
+	SockSpray *client;
 	struct timespec timeout;
 	struct kevent event, kev;
 	timeout.tv_sec = 0;
@@ -225,7 +225,7 @@ void SockPoller::Service(void)
 	do {
 		rc = kevent(poller_, NULL, 0, &event, 1, &timeout);
 		if(rc > 0) {
-			client = reinterpret_cast<SockPad *>(event.udata);
+			client = reinterpret_cast<SockSpray *>(event.udata);
 			if(event.flags & (EV_EOF | EV_ERROR)) {
 				EV_SET(&kev, event.ident, event.filter, EV_DELETE, 0, 0, NULL);
 				kevent(poller_, &kev, 1, NULL, 0, NULL);

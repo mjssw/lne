@@ -18,13 +18,13 @@
 
 
 LNE_INLINE SockHander *
-SockPad::get_hander(void)
+SockSpray::get_hander(void)
 {
 	return hander_;
 }
 
 LNE_INLINE void *
-SockPad::get_context(void)
+SockSpray::get_context(void)
 {
 	return context_;
 }

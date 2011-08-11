@@ -31,7 +31,7 @@
 #include "SockStream.h"
 #include "SockAcceptor.h"
 #include "SockConnector.h"
-#include "SockPad.h"
+#include "SockSpray.h"
 #include "SockPoller.h"
 #include "ObjectList_T.h"
 #include "ObjectQueue_T.h"

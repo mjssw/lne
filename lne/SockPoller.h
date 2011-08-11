@@ -20,7 +20,7 @@
 #define LNE_SOCKPOLLER_H
 
 #include "config.h"
-#include "SockPad.h"
+#include "SockSpray.h"
 #include "SockStream.h"
 #include "DataBlockPool.h"
 #include "ObjectStack_T.h"
@@ -41,7 +41,7 @@ private:
 	SockPoller(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache);
 	~SockPoller(void);
 	void Service(void);
-	void FreeSock(SockPad *client);
+	void FreeSock(SockSpray *client);
 
 	DataBlockPool *pool_;
 	bool initialized_;
@@ -50,7 +50,7 @@ private:
 	LNE_UINT reference_count_;
 	LNE_UINT thread_workers_;
 	LNE_UINT limit_cache_;
-	ObjectStack<SockPad *, 1000> clients_free_;
+	ObjectStack<SockSpray *, 1000> clients_free_;
 #if defined(LNE_WIN32)
 	HANDLE poller_;
 	HANDLE *threads_;

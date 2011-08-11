@@ -16,7 +16,7 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SockPad.h"
+#include "SockSpray.h"
 #include "DataBlockPool.h"
 
 LNE_NAMESPACE_USING
@@ -29,7 +29,7 @@ SockManager::~SockManager()
 {
 }
 
-SockPad::SockPad(SockManager *manager, LNE_UINT limit_cache)
+SockSpray::SockSpray(SockManager *manager, LNE_UINT limit_cache)
 	: manager_(manager), limit_cache_(limit_cache), lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {
 	hander_ = NULL;
@@ -59,11 +59,11 @@ SockPad::SockPad(SockManager *manager, LNE_UINT limit_cache)
 #endif
 }
 
-SockPad::~SockPad(void)
+SockSpray::~SockSpray(void)
 {
 }
 
-SockPad *SockPad::AddRef(void)
+SockSpray *SockSpray::AddRef(void)
 {
 	lock_.Lock();
 	++reference_count_;
@@ -71,7 +71,7 @@ SockPad *SockPad::AddRef(void)
 	return this;
 }
 
-void SockPad::Release(void)
+void SockSpray::Release(void)
 {
 	bool can_destory = false;
 	lock_.Lock();
@@ -81,7 +81,7 @@ void SockPad::Release(void)
 		manager_->FreeSock(this);
 }
 
-LNE_UINT SockPad::Apply(void)
+LNE_UINT SockSpray::Apply(void)
 {
 	LNE_UINT result = LNERR_UNKNOW;
 #if defined(LNE_WIN32)
@@ -125,7 +125,7 @@ LNE_UINT SockPad::Apply(void)
 	return result;
 }
 
-void SockPad::Clean(void)
+void SockSpray::Clean(void)
 {
 	if(socket_ != INVALID_SOCKET) {
 		closesocket(socket_);
@@ -148,7 +148,7 @@ void SockPad::Clean(void)
 #endif
 }
 
-void SockPad::Send(DataBlock *block)
+void SockSpray::Send(DataBlock *block)
 {
 	LNE_ASSERT2(block != NULL && !block->IsEmpty());
 	bool to_handle = true;
@@ -176,7 +176,7 @@ void SockPad::Send(DataBlock *block)
 		__HandleSend();
 }
 
-void SockPad::Send(DataBlock *blocks[], LNE_UINT count)
+void SockSpray::Send(DataBlock *blocks[], LNE_UINT count)
 {
 	LNE_ASSERT2(blocks != NULL && count > 0);
 	bool to_handle = true;
@@ -208,7 +208,7 @@ void SockPad::Send(DataBlock *blocks[], LNE_UINT count)
 		__HandleSend();
 }
 
-void SockPad::Shutdown(void)
+void SockSpray::Shutdown(void)
 {
 	bool to_handle = true;
 	// ignore when shutdown
@@ -232,7 +232,7 @@ void SockPad::Shutdown(void)
 	}
 }
 
-void SockPad::__Shutdown(void)
+void SockSpray::__Shutdown(void)
 {
 	if(!shutdown_state_.invoke) {
 		shutdown_state_.invoke = true;
@@ -257,7 +257,7 @@ void SockPad::__Shutdown(void)
 #endif
 }
 
-void SockPad::HandleSend(void)
+void SockSpray::HandleSend(void)
 {
 	EnterThreadSafe();
 #if defined(LNE_WIN32)
@@ -269,7 +269,7 @@ void SockPad::HandleSend(void)
 	LeaveThreadSafe();
 }
 
-void SockPad::__HandleSend(void)
+void SockSpray::__HandleSend(void)
 {
 	bool to_handle = true;
 	// ignore when shutdown
@@ -367,7 +367,7 @@ send_data_next:
 		goto send_data_next;
 }
 
-void SockPad::HandleRecv(DataBlockPool *pool)
+void SockSpray::HandleRecv(DataBlockPool *pool)
 {
 	EnterThreadSafe();
 #if defined(LNE_WIN32)
@@ -379,7 +379,7 @@ void SockPad::HandleRecv(DataBlockPool *pool)
 	LeaveThreadSafe();
 }
 
-void SockPad::__HandleRecv(DataBlockPool *pool)
+void SockSpray::__HandleRecv(DataBlockPool *pool)
 {
 	bool to_handle = true;
 	// ignore when shutdown
@@ -472,7 +472,7 @@ recv_data_next:
 		goto recv_data_next;
 }
 
-void SockPad::HandleShutdown(void)
+void SockSpray::HandleShutdown(void)
 {
 #if defined(LNE_FREEBSD)
 	bool to_handle = false;
@@ -488,21 +488,21 @@ void SockPad::HandleShutdown(void)
 	LeaveThreadSafe();
 }
 
-void SockPad::__HandleShutdown(void)
+void SockSpray::__HandleShutdown(void)
 {
 	shutdown_lock_.Lock();
 	shutdown_state_.already = true;
 	shutdown_lock_.Unlock();
 }
 
-void SockPad::EnterThreadSafe(void)
+void SockSpray::EnterThreadSafe(void)
 {
 	lock_.Lock();
 	++thread_count_;
 	lock_.Unlock();
 }
 
-void SockPad::LeaveThreadSafe(void)
+void SockSpray::LeaveThreadSafe(void)
 {
 	LNE_UINT num_flag = 0;
 	lock_.Lock();

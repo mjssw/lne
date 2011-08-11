@@ -23,7 +23,7 @@
     <ClInclude Include="SockAddr.h" />
     <ClInclude Include="SockBase.h" />
     <ClInclude Include="SockConnector.h" />
-    <ClInclude Include="SockPad.h" />
+    <ClInclude Include="SockSpray.h" />
     <ClInclude Include="SockPoller.h" />
     <ClInclude Include="SockStream.h" />
     <ClInclude Include="Thread.h" />
@@ -42,7 +42,7 @@
     <ClCompile Include="SockAddr.cpp" />
     <ClCompile Include="SockBase.cpp" />
     <ClCompile Include="SockConnector.cpp" />
-    <ClCompile Include="SockPad.cpp" />
+    <ClCompile Include="SockSpray.cpp" />
     <ClCompile Include="SockPoller.cpp" />
     <ClCompile Include="SockStream.cpp" />
     <ClCompile Include="Thread.cpp" />
@@ -62,7 +62,7 @@
     <None Include="SockAddr.inl" />
     <None Include="SockBase.inl" />
     <None Include="SockConnector.inl" />
-    <None Include="SockPad.inl" />
+    <None Include="SockSpray.inl" />
     <None Include="SockPoller.inl" />
     <None Include="SockStream.inl" />
     <None Include="Thread.inl" />
