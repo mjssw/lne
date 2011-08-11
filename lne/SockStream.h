@@ -16,8 +16,8 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_SOCKBASE_H
-#define LNE_SOCKBASE_H
+#ifndef LNE_SOCKSTREAM_H
+#define LNE_SOCKSTREAM_H
 
 #include "config.h"
 #include "SockAddr.h"

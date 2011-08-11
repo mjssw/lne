@@ -16,8 +16,8 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_SOCKSTREAM_H
-#define LNE_SOCKSTREAM_H
+#ifndef LNE_SOCKWAVES_H
+#define LNE_SOCKWAVES_H
 
 #include "SockStream.h"
 #include "TimeValue.h"

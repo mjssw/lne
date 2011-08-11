@@ -16,8 +16,8 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_SOCKPAD_H
-#define LNE_SOCKPAD_H
+#ifndef LNE_SOCKSPRAY_H
+#define LNE_SOCKSPRAY_H
 
 #include "config.h"
 #include "SockStream.h"
