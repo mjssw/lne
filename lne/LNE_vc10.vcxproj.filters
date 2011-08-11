@@ -52,7 +52,7 @@
     <ClInclude Include="DataBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SockStream.h">
+    <ClInclude Include="SockWaves.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SockAddr.h">
@@ -108,7 +108,7 @@
     <ClCompile Include="DataBlock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SockStream.cpp">
+    <ClCompile Include="SockWaves.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockAddr.cpp">
@@ -155,7 +155,7 @@
     <None Include="DataBlock.inl">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="SockStream.inl">
+    <None Include="SockWaves.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="SockAddr.inl">

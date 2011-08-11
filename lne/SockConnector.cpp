@@ -49,7 +49,7 @@ void SockConnector::Release(void)
 	delete this;
 }
 
-LNE_UINT SockConnector::Connect(SockStream **stream, const SockAddr &addr, const TimeValue *tv)
+LNE_UINT SockConnector::Connect(SockWaves **stream, const SockAddr &addr, const TimeValue *tv)
 {
 	LNE_ASSERT(stream != NULL, LNERR_PARAMETER);
 	LNE_UINT result = LNERR_UNKNOW;
@@ -85,7 +85,7 @@ LNE_UINT SockConnector::Connect(SockStream **stream, const SockAddr &addr, const
 				result = LNERR_OK;
 		}
 		if(result == LNERR_OK) {
-			*stream = SockStream::NewInstance(sock);
+			*stream = SockWaves::NewInstance(sock);
 			if(*stream)
 				result = LNERR_OK;
 			else

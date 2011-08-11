@@ -119,7 +119,7 @@ void SockPoller::Release(void)
 		delete this;
 }
 
-LNE_UINT SockPoller::Managed(SockStream *stream, SockHander *hander, void *context)
+LNE_UINT SockPoller::Managed(SockWaves *stream, SockHander *hander, void *context)
 {
 	LNE_ASSERT(stream != NULL && stream->Available() && hander != NULL, LNERR_PARAMETER);
 	SockSpray *client  = NULL;

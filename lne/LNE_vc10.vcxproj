@@ -25,7 +25,7 @@
     <ClInclude Include="SockConnector.h" />
     <ClInclude Include="SockSpray.h" />
     <ClInclude Include="SockPoller.h" />
-    <ClInclude Include="SockStream.h" />
+    <ClInclude Include="SockWaves.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="ThreadCondition.h" />
     <ClInclude Include="ThreadLock.h" />
@@ -44,7 +44,7 @@
     <ClCompile Include="SockConnector.cpp" />
     <ClCompile Include="SockSpray.cpp" />
     <ClCompile Include="SockPoller.cpp" />
-    <ClCompile Include="SockStream.cpp" />
+    <ClCompile Include="SockWaves.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="ThreadCondition.cpp" />
     <ClCompile Include="ThreadMutex.cpp" />
@@ -64,7 +64,7 @@
     <None Include="SockConnector.inl" />
     <None Include="SockSpray.inl" />
     <None Include="SockPoller.inl" />
-    <None Include="SockStream.inl" />
+    <None Include="SockWaves.inl" />
     <None Include="Thread.inl" />
     <None Include="ThreadCondition.inl" />
     <None Include="ThreadMutex.inl" />

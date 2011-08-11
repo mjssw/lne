@@ -11,7 +11,7 @@ void TestClient()
 		printf("connector cannot create\n");
 		return;
 	}
-	SockStream *stream;
+	SockWaves *stream;
 	if(connector->Connect(&stream) != LNERR_OK) {
 		printf("connector cannot connect\n");
 		connector->Release();

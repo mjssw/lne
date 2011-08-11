@@ -61,7 +61,7 @@ void SockAcceptor::Release(void)
 	delete this;
 }
 
-LNE_UINT SockAcceptor::Accept(SockStream **stream, const TimeValue *tv)
+LNE_UINT SockAcceptor::Accept(SockWaves **stream, const TimeValue *tv)
 {
 	LNE_ASSERT(socket_ != INVALID_SOCKET && stream != NULL, LNERR_PARAMETER);
 	if(tv) {
@@ -75,7 +75,7 @@ LNE_UINT SockAcceptor::Accept(SockStream **stream, const TimeValue *tv)
 	LNE_UINT result = LNERR_UNKNOW;
 	SOCKET sock = accept(socket_, NULL, NULL);
 	if(sock != INVALID_SOCKET) {
-		*stream = SockStream::NewInstance(sock);
+		*stream = SockWaves::NewInstance(sock);
 		if(*stream)
 			result = LNERR_OK;
 		else

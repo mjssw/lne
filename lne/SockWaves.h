@@ -25,7 +25,7 @@
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockStream : public SockBase
+class LNE_Export SockWaves : public SockBase
 {
 	friend class SockPoller;
 	friend class SockAcceptor;
@@ -37,15 +37,15 @@ public:
 	LNE_UINT Recv(DataBlock *block, const TimeValue &tv);
 
 private:
-	SockStream(void);
-	~SockStream(void);
-	static SockStream *NewInstance(SOCKET sock);
+	SockWaves(void);
+	~SockWaves(void);
+	static SockWaves *NewInstance(SOCKET sock);
 	LNE_UINT Recv(DataBlock *block, const TimeValue *tv);
 
 	ThreadLock lock_;
 };
 
-#include "SockStream.inl"
+#include "SockWaves.inl"
 
 LNE_NAMESPACE_END
 

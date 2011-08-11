@@ -22,7 +22,7 @@
 #include "config.h"
 #include "SockAddr.h"
 #include "TimeValue.h"
-#include "SockStream.h"
+#include "SockWaves.h"
 
 LNE_NAMESPACE_BEGIN
 
@@ -32,14 +32,14 @@ public:
 	static SockConnector *NewInstance(const SockAddr &addr, const TimeValue *tv = NULL);
 	void Release(void);
 
-	LNE_UINT Connect(SockStream **stream);
-	static LNE_UINT Connect(SockStream **stream, const SockAddr &addr);
-	static LNE_UINT Connect(SockStream **stream, const SockAddr &addr, const TimeValue &tv);
+	LNE_UINT Connect(SockWaves **stream);
+	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr);
+	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr, const TimeValue &tv);
 
 private:
 	SockConnector(void);
 	~SockConnector(void);
-	static LNE_UINT Connect(SockStream **stream, const SockAddr &addr, const TimeValue *tv);
+	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr, const TimeValue *tv);
 
 	SockAddr addr_;
 	bool use_timeout_;

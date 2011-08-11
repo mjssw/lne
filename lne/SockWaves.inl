@@ -17,13 +17,13 @@
  */
 
 LNE_INLINE LNE_UINT
-SockStream::Recv(DataBlock *block)
+SockWaves::Recv(DataBlock *block)
 {
 	return Recv(block, NULL);
 }
 
 LNE_INLINE LNE_UINT
-SockStream::Recv(DataBlock *block, const TimeValue &tv)
+SockWaves::Recv(DataBlock *block, const TimeValue &tv)
 {
 	return Recv(block, &tv);
 }

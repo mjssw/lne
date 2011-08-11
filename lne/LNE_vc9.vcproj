@@ -210,7 +210,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.cpp"
+				RelativePath=".\SockWaves.cpp"
 				>
 			</File>
 			<File
@@ -304,7 +304,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.h"
+				RelativePath=".\SockWaves.h"
 				>
 			</File>
 			<File
@@ -390,7 +390,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.inl"
+				RelativePath=".\SockWaves.inl"
 				>
 			</File>
 			<File

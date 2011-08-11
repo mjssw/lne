@@ -28,7 +28,7 @@
 #include "DataBlock.h"
 #include "DataBlockPool.h"
 #include "SockAddr.h"
-#include "SockStream.h"
+#include "SockWaves.h"
 #include "SockAcceptor.h"
 #include "SockConnector.h"
 #include "SockSpray.h"

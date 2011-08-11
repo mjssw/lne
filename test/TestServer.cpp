@@ -46,7 +46,7 @@ void TestServer()
 		return;
 	}
 	LNE_UINT count = 0;
-	SockStream *stream;
+	SockWaves *stream;
 	SockAddr addr_sock, addr_peer;
 	while(acceptor->Accept(&stream) == LNERR_OK) {
 		if(count > 0) {

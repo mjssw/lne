@@ -16,36 +16,36 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SockStream.h"
+#include "SockWaves.h"
 
 LNE_NAMESPACE_USING
 
-SockStream::SockStream(void)
+SockWaves::SockWaves(void)
 {
 }
 
-SockStream::~SockStream(void)
+SockWaves::~SockWaves(void)
 {
 }
 
-SockStream *SockStream::NewInstance(SOCKET sock)
+SockWaves *SockWaves::NewInstance(SOCKET sock)
 {
 	LNE_ASSERT(sock != INVALID_SOCKET, NULL);
-	SockStream *result = NULL;
+	SockWaves *result = NULL;
 	try {
-		result = new SockStream();
+		result = new SockWaves();
 		result->socket_ = sock;
 	} catch(std::bad_alloc) {
 	}
 	return result;
 }
 
-void SockStream::Release()
+void SockWaves::Release()
 {
 	delete this;
 }
 
-LNE_UINT SockStream::Send(DataBlock *block)
+LNE_UINT SockWaves::Send(DataBlock *block)
 {
 	LNE_ASSERT(block != NULL && block->get_size() > 0, LNERR_PARAMETER);
 	ssize_t len;
@@ -61,7 +61,7 @@ LNE_UINT SockStream::Send(DataBlock *block)
 	return LNERR_OK;
 }
 
-LNE_UINT SockStream::Recv(DataBlock *block, const TimeValue *tv)
+LNE_UINT SockWaves::Recv(DataBlock *block, const TimeValue *tv)
 {
 	LNE_ASSERT(block != NULL && block->get_capacity() > 0, LNERR_PARAMETER);
 	if(tv) {

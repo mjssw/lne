@@ -20,7 +20,7 @@
 #define LNE_SOCKACCEPTOR_H
 
 #include "config.h"
-#include "SockStream.h"
+#include "SockWaves.h"
 
 LNE_NAMESPACE_BEGIN
 
@@ -30,13 +30,13 @@ public:
 	static SockAcceptor *NewInstance(const SockAddr &addr, LNE_UINT backlog = 5, const TimeValue *tv = NULL);
 	void Release(void);
 
-	LNE_UINT Accept(SockStream **stream);
-	LNE_UINT Accept(SockStream **stream, const TimeValue &tv);
+	LNE_UINT Accept(SockWaves **stream);
+	LNE_UINT Accept(SockWaves **stream, const TimeValue &tv);
 
 private:
 	SockAcceptor(void);
 	~SockAcceptor(void);
-	LNE_UINT Accept(SockStream **stream, const TimeValue *tv);
+	LNE_UINT Accept(SockWaves **stream, const TimeValue *tv);
 
 	SOCKET socket_;
 	bool use_timeout_;
