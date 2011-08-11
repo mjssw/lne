@@ -16,37 +16,32 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_SOCKWAVES_H
-#define LNE_SOCKWAVES_H
+#ifndef LNE_SOCKPAD_H
+#define LNE_SOCKPAD_H
 
-#include "SockPad.h"
-#include "SockStream.h"
-#include "TimeValue.h"
-#include "DataBlock.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockWaves : public SockStream
+class SockPad
 {
-	friend class SockPoller;
-	friend class SockAcceptor;
-	friend class SockConnector;
 public:
-	static SockWaves *NewInstance(SockPad& sock);
-	void Release();
-	LNE_UINT Send(DataBlock *block);
-	LNE_UINT Recv(DataBlock *block);
-	LNE_UINT Recv(DataBlock *block, const TimeValue &tv);
+	SockPad(void);
+	~SockPad(void);
+	SockPad(SockPad& other);
+	SockPad& operator = (SockPad& other);
+	SockPad& operator = (SOCKET sock);
+
+	operator bool(void);
+	operator SOCKET(void);
+	void Attach(SOCKET sock);
+	SOCKET Detach();
 
 private:
-	SockWaves(void);
-	~SockWaves(void);
-	LNE_UINT Recv(DataBlock *block, const TimeValue *tv);
-
-	ThreadLock lock_;
+	SOCKET socket_;
 };
 
-#include "SockWaves.inl"
+#include "SockPad.inl"
 
 LNE_NAMESPACE_END
 

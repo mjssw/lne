@@ -61,9 +61,9 @@ void SockAcceptor::Release(void)
 	delete this;
 }
 
-LNE_UINT SockAcceptor::Accept(SockWaves **stream, const TimeValue *tv)
+LNE_UINT SockAcceptor::Accept(SockPad &sock, const TimeValue *tv)
 {
-	LNE_ASSERT(socket_ != INVALID_SOCKET && stream != NULL, LNERR_PARAMETER);
+	LNE_ASSERT(socket_ != INVALID_SOCKET, LNERR_PARAMETER);
 	if(tv) {
 		fd_set fds;
 		FD_ZERO(&fds);
@@ -72,16 +72,6 @@ LNE_UINT SockAcceptor::Accept(SockWaves **stream, const TimeValue *tv)
 		if(select(socket_, &fds, NULL, NULL, (timeval *)timeout) < 1)
 			return LNERR_TIMEOUT;
 	}
-	LNE_UINT result = LNERR_UNKNOW;
-	SOCKET sock = accept(socket_, NULL, NULL);
-	if(sock != INVALID_SOCKET) {
-		*stream = SockWaves::NewInstance(sock);
-		if(*stream)
-			result = LNERR_OK;
-		else
-			result = LNERR_NOMEMORY;
-		if(result != LNERR_OK)
-			closesocket(sock);
-	}
-	return result;
+	sock = accept(socket_, NULL, NULL);
+	return sock ? LNERR_OK : LNERR_UNKNOW;
 }

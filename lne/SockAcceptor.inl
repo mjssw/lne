@@ -17,13 +17,13 @@
  */
 
 LNE_INLINE LNE_UINT
-SockAcceptor::Accept(SockWaves **stream)
+SockAcceptor::Accept(SockPad& sock)
 {
-	return Accept(stream, use_timeout_ ? &timeout_ : NULL);
+	return Accept(sock, use_timeout_ ? &timeout_ : NULL);
 }
 
 LNE_INLINE LNE_UINT
-SockAcceptor::Accept(SockWaves **stream, const TimeValue &tv)
+SockAcceptor::Accept(SockPad& sock, const TimeValue &tv)
 {
-	return Accept(stream, &tv);
+	return Accept(sock, &tv);
 }

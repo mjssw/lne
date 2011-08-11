@@ -49,12 +49,11 @@ void SockConnector::Release(void)
 	delete this;
 }
 
-LNE_UINT SockConnector::Connect(SockWaves **stream, const SockAddr &addr, const TimeValue *tv)
+LNE_UINT SockConnector::Connect(SockPad& sock, const SockAddr &addr, const TimeValue *tv)
 {
-	LNE_ASSERT(stream != NULL, LNERR_PARAMETER);
 	LNE_UINT result = LNERR_UNKNOW;
-	SOCKET sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
-	if(sock != INVALID_SOCKET) {
+	sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
+	if(sock) {
 		if(tv) {
 #if defined(LNE_WIN32)
 			unsigned long value = 1;
@@ -66,9 +65,9 @@ LNE_UINT SockConnector::Connect(SockWaves **stream, const SockAddr &addr, const 
 				connect(sock, addr.get_addr(), addr.get_size());
 				fd_set fds;
 				FD_ZERO(&fds);
-				FD_SET(sock, &fds);
+				FD_SET((SOCKET)sock, &fds);
 				TimeValue timeout(*tv);
-				if(select(sock + 1, NULL, &fds, NULL, static_cast<timeval *>(timeout)) < 1)
+				if(select((SOCKET)sock + 1, NULL, &fds, NULL, static_cast<timeval *>(timeout)) < 1)
 					result = LNERR_TIMEOUT;
 				else {
 #if defined(LNE_WIN32)
@@ -84,17 +83,8 @@ LNE_UINT SockConnector::Connect(SockWaves **stream, const SockAddr &addr, const 
 			if(connect(sock, addr.get_addr(), addr.get_size()) == 0)
 				result = LNERR_OK;
 		}
-		if(result == LNERR_OK) {
-			*stream = SockWaves::NewInstance(sock);
-			if(*stream)
-				result = LNERR_OK;
-			else
-				result = LNERR_NOMEMORY;
-		}
-		if(result != LNERR_OK) {
-			closesocket(sock);
+		if(result != LNERR_OK)
 			sock = INVALID_SOCKET;
-		}
 	}
 	return result;
 }

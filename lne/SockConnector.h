@@ -32,14 +32,14 @@ public:
 	static SockConnector *NewInstance(const SockAddr &addr, const TimeValue *tv = NULL);
 	void Release(void);
 
-	LNE_UINT Connect(SockWaves **stream);
-	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr);
-	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr, const TimeValue &tv);
+	LNE_UINT Connect(SockPad& sock);
+	static LNE_UINT Connect(SockPad& sock, const SockAddr &addr);
+	static LNE_UINT Connect(SockPad& sock, const SockAddr &addr, const TimeValue &tv);
 
 private:
 	SockConnector(void);
 	~SockConnector(void);
-	static LNE_UINT Connect(SockWaves **stream, const SockAddr &addr, const TimeValue *tv);
+	static LNE_UINT Connect(SockPad& sock, const SockAddr &addr, const TimeValue *tv);
 
 	SockAddr addr_;
 	bool use_timeout_;

@@ -119,9 +119,9 @@ void SockPoller::Release(void)
 		delete this;
 }
 
-LNE_UINT SockPoller::Managed(SockWaves *stream, SockHander *hander, void *context)
+LNE_UINT SockPoller::Managed(SockPad &sock, SockHander *hander, void *context)
 {
-	LNE_ASSERT(stream != NULL && stream->Available() && hander != NULL, LNERR_PARAMETER);
+	LNE_ASSERT(sock && hander != NULL, LNERR_PARAMETER);
 	SockSpray *client  = NULL;
 	lock_.Lock();
 	if(clients_free_.Pop(client) != LNERR_OK) {
@@ -133,9 +133,7 @@ LNE_UINT SockPoller::Managed(SockWaves *stream, SockHander *hander, void *contex
 	lock_.Unlock();
 	if(client == NULL)
 		return LNERR_NOMEMORY;
-	// detach stream socket
-	client->socket_ = stream->socket_;
-	stream->socket_ = INVALID_SOCKET;
+	client->socket_ = sock.Detach();
 	client->hander_ = hander;
 	client->context_ = context;
 	client->poller_ = poller_;

@@ -194,11 +194,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.cpp"
+				RelativePath=".\SockConnector.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\SockConnector.cpp"
+				RelativePath=".\SockPoller.cpp"
 				>
 			</File>
 			<File
@@ -206,7 +206,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.cpp"
+				RelativePath=".\SockStream.cpp"
 				>
 			</File>
 			<File
@@ -288,11 +288,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.h"
+				RelativePath=".\SockConnector.h"
 				>
 			</File>
 			<File
-				RelativePath=".\SockConnector.h"
+				RelativePath=".\SockPad.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SockPoller.h"
 				>
 			</File>
 			<File
@@ -300,7 +304,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.h"
+				RelativePath=".\SockStream.h"
 				>
 			</File>
 			<File
@@ -374,11 +378,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockStream.inl"
+				RelativePath=".\SockConnector.inl"
 				>
 			</File>
 			<File
-				RelativePath=".\SockConnector.inl"
+				RelativePath=".\SockPad.inl"
+				>
+			</File>
+			<File
+				RelativePath=".\SockPoller.inl"
 				>
 			</File>
 			<File
@@ -386,7 +394,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.inl"
+				RelativePath=".\SockStream.inl"
 				>
 			</File>
 			<File

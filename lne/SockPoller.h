@@ -35,7 +35,7 @@ public:
 	static SockPoller *NewInstance(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache = DEFAULT_LIMIT_CACHE);
 	void Release(void);
 
-	LNE_UINT Managed(SockWaves *stream, SockHander *hander, void *context = NULL);
+	LNE_UINT Managed(SockPad& sock, SockHander *hander, void *context = NULL);
 
 private:
 	SockPoller(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache);

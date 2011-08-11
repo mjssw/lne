@@ -7,8 +7,16 @@ class MyHander: public SockHander
 public:
 	MyHander() {
 		count_ = 0;
+		first_ = false;
 	}
 	void HandleData(SockSpray *client, DataBlock *block) {
+		if(!first_) {
+			first_ = true;
+			SockAddr addr_sock, addr_peer;
+			client->GetSockAddr(addr_sock);
+			client->GetPeerAddr(addr_peer);
+			printf("accept %s <= %s\n", addr_sock.get_addr_text(), addr_peer.get_addr_text());
+		}
 		DataBlock *blocks[2];
 		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
 		printf("[%u] Recv Data: %u\n", index, block->get_size());
@@ -26,6 +34,7 @@ public:
 		delete this;
 	}
 private:
+	bool first_;
 	LNE_UINT count_;
 };
 
@@ -46,18 +55,11 @@ void TestServer()
 		return;
 	}
 	LNE_UINT count = 0;
-	SockWaves *stream;
-	SockAddr addr_sock, addr_peer;
-	while(acceptor->Accept(&stream) == LNERR_OK) {
-		if(count > 0) {
-			stream->Release();
+	SockPad sock;
+	while(acceptor->Accept(sock) == LNERR_OK) {
+		if(count > 0)
 			break;
-		}
-		stream->GetSockAddr(addr_sock);
-		stream->GetPeerAddr(addr_peer);
-		printf("accept %s <= %s\n", addr_sock.get_addr_text(), addr_peer.get_addr_text());
-		poller->Managed(stream, new MyHander(), reinterpret_cast<void *>(++count));
-		stream->Release();
+		poller->Managed(sock, new MyHander(), reinterpret_cast<void *>(++count));
 	}
 	pool->Release();
 	poller->Release();

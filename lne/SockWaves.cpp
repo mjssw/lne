@@ -28,13 +28,13 @@ SockWaves::~SockWaves(void)
 {
 }
 
-SockWaves *SockWaves::NewInstance(SOCKET sock)
+SockWaves *SockWaves::NewInstance(SockPad &sock)
 {
-	LNE_ASSERT(sock != INVALID_SOCKET, NULL);
+	LNE_ASSERT(sock, NULL);
 	SockWaves *result = NULL;
 	try {
 		result = new SockWaves();
-		result->socket_ = sock;
+		result->socket_ = sock.Detach();
 	} catch(std::bad_alloc) {
 	}
 	return result;
