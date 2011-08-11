@@ -21,7 +21,7 @@
     <ClInclude Include="ObjectStack_T.h" />
     <ClInclude Include="SockAcceptor.h" />
     <ClInclude Include="SockAddr.h" />
-    <ClInclude Include="SockBase.h" />
+    <ClInclude Include="SockStream.h" />
     <ClInclude Include="SockConnector.h" />
     <ClInclude Include="SockSpray.h" />
     <ClInclude Include="SockPoller.h" />
@@ -40,7 +40,7 @@
     <ClCompile Include="lne.cpp" />
     <ClCompile Include="SockAcceptor.cpp" />
     <ClCompile Include="SockAddr.cpp" />
-    <ClCompile Include="SockBase.cpp" />
+    <ClCompile Include="SockStream.cpp" />
     <ClCompile Include="SockConnector.cpp" />
     <ClCompile Include="SockSpray.cpp" />
     <ClCompile Include="SockPoller.cpp" />
@@ -60,7 +60,7 @@
     <None Include="ObjectStack_T.inl" />
     <None Include="SockAcceptor.inl" />
     <None Include="SockAddr.inl" />
-    <None Include="SockBase.inl" />
+    <None Include="SockStream.inl" />
     <None Include="SockConnector.inl" />
     <None Include="SockSpray.inl" />
     <None Include="SockPoller.inl" />

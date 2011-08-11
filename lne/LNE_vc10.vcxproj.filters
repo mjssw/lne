@@ -67,7 +67,7 @@
     <ClInclude Include="SockConnector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SockBase.h">
+    <ClInclude Include="SockStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ObjectList_T.h">
@@ -126,7 +126,7 @@
     <ClCompile Include="SockConnector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SockBase.cpp">
+    <ClCompile Include="SockStream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockSpray.cpp">
@@ -170,7 +170,7 @@
     <None Include="SockConnector.inl">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="SockBase.inl">
+    <None Include="SockStream.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="ObjectList_T.inl">

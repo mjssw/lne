@@ -19,13 +19,13 @@
 #ifndef LNE_SOCKSTREAM_H
 #define LNE_SOCKSTREAM_H
 
-#include "SockBase.h"
+#include "SockStream.h"
 #include "TimeValue.h"
 #include "DataBlock.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockWaves : public SockBase
+class LNE_Export SockWaves : public SockStream
 {
 	friend class SockPoller;
 	friend class SockAcceptor;

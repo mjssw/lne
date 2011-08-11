@@ -20,7 +20,7 @@
 #define LNE_SOCKPAD_H
 
 #include "config.h"
-#include "SockBase.h"
+#include "SockStream.h"
 #include "DataBlock.h"
 #include "ThreadLock.h"
 #include "ObjectQueue_T.h"
@@ -46,7 +46,7 @@ public:
 	virtual void FreeSock(SockSpray *client) = 0;
 };
 
-class LNE_Export SockSpray: public SockBase
+class LNE_Export SockSpray: public SockStream
 {
 	friend class SockPoller;
 public:

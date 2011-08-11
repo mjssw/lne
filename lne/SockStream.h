@@ -16,8 +16,30 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-LNE_INLINE bool
-SockBase::Available(void)
+#ifndef LNE_SOCKBASE_H
+#define LNE_SOCKBASE_H
+
+#include "config.h"
+#include "SockAddr.h"
+
+LNE_NAMESPACE_BEGIN
+
+class LNE_Export SockStream
 {
-	return socket_ != INVALID_SOCKET;
-}
+public:
+	bool Available(void);
+	LNE_UINT GetSockAddr(SockAddr &addr);
+	LNE_UINT GetPeerAddr(SockAddr &addr);
+
+protected:
+	SockStream(void);
+	virtual ~SockStream(void) = 0;
+
+	SOCKET socket_;
+};
+
+#include "SockStream.inl"
+
+LNE_NAMESPACE_END
+
+#endif

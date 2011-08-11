@@ -16,22 +16,22 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SockBase.h"
+#include "SockStream.h"
 
 LNE_NAMESPACE_USING
 
-SockBase::SockBase(void)
+SockStream::SockStream(void)
 {
 	socket_ = INVALID_SOCKET;
 }
 
-SockBase::~SockBase(void)
+SockStream::~SockStream(void)
 {
 	if(socket_ != INVALID_SOCKET)
 		closesocket(socket_);
 }
 
-LNE_UINT SockBase::GetSockAddr(SockAddr &addr)
+LNE_UINT SockStream::GetSockAddr(SockAddr &addr)
 {
 	char address[sizeof(sockaddr_in6)];
 	socklen_t len = sizeof(sockaddr_in6);
@@ -40,7 +40,7 @@ LNE_UINT SockBase::GetSockAddr(SockAddr &addr)
 	return addr.Set(reinterpret_cast<sockaddr *>(address), len);
 }
 
-LNE_UINT SockBase::GetPeerAddr(SockAddr &addr)
+LNE_UINT SockStream::GetPeerAddr(SockAddr &addr)
 {
 	char address[sizeof(sockaddr_in6)];
 	socklen_t len = sizeof(sockaddr_in6);
