@@ -33,7 +33,7 @@ public:
 protected:
 	RefObject(void);
 	void SetRef(LNE_UINT ref);
-	virtual void HandleDestroy() = 0;
+	virtual void ObjectDestroy() = 0;
 
 private:
 	ThreadLock lock_;

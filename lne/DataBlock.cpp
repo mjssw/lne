@@ -46,7 +46,7 @@ DataBlock *DataBlock::NewInstance(LNE_UINT capacity)
 	return NULL;
 }
 
-void DataBlock::HandleDestroy(void)
+void DataBlock::ObjectDestroy(void)
 {
 	if(pool_) {
 		size_ = 0;

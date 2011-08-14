@@ -97,7 +97,7 @@ SockPoller *SockPoller::NewInstance(LNE_UINT workers)
 	return retval;
 }
 
-void SockPoller::HandleDestroy(void)
+void SockPoller::ObjectDestroy(void)
 {
 	delete this;
 }

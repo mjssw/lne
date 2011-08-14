@@ -35,7 +35,7 @@ private:
 	SockPoller(LNE_UINT workers);
 	~SockPoller(void);
 	void Service(void);
-	void HandleDestroy();
+	void ObjectDestroy();
 
 	ThreadLock lock_;
 	bool exit_request_;

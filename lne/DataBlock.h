@@ -49,7 +49,7 @@ public:
 private:
 	DataBlock(void);
 	~DataBlock(void);
-	void HandleDestroy(void);
+	void ObjectDestroy(void);
 
 	char *buffer_;
 	LNE_UINT size_; // customer variable, <= capacity_

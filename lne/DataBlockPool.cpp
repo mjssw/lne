@@ -68,7 +68,7 @@ DataBlockPool *DataBlockPool::NewInstance(LNE_UINT capacity, LNE_UINT cache_bloc
 	return NULL;
 }
 
-void DataBlockPool::HandleDestroy(void)
+void DataBlockPool::ObjectDestroy(void)
 {
 	this->~DataBlockPool();
 	free(this);

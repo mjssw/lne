@@ -20,7 +20,7 @@
 
 LNE_NAMESPACE_USING
 
-void SockPoolable::HandleDestroy(void)
+void SockPoolable::ObjectDestroy(void)
 {
 	Clean();
 	if(factory_) {
@@ -60,7 +60,7 @@ SockPoolable *SockFactory::PopObject(void)
 	return object;
 }
 
-void SockFactory::HandleDestroy(void)
+void SockFactory::ObjectDestroy(void)
 {
 	delete this;
 }
