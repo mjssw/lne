@@ -35,5 +35,5 @@ void RefObject::Release(void)
 	}
 	lock_.Unlock();
 	if(destroy)
-		HandleDestroy();
+		ObjectDestroy();
 }
