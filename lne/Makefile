@@ -12,8 +12,9 @@ LN = ln -sf
 CFLAGS += -Wall -fPIC
 LDFLAGS += -shared -pthread
 PREFIX = /usr
-SONAME = liblne.so.$(MAJORVN)
-TARGET = $(SONAME).$(VERSION)
+LNNAME = liblne.so
+SONAME  = $(LNNAME).$(MAJORVN)
+TARGET  = $(LNNAME).$(VERSION)
 OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
 ifeq ($(RELEASE),y)
@@ -35,9 +36,10 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJS) -Wl,--soname=$(SONAME)
 	$(LN) $(TARGET) $(SONAME)
+	$(LN) $(SONAME) $(LNNAME)
 
 clean:
-	rm -fr $(SONAME) $(TARGET) *.o config-os.h
+	rm -fr $(LNNAME) $(SONAME) $(TARGET) *.o config-os.h
 
 install: all
 	mkdir -p $(PREFIX)/lib
@@ -45,9 +47,11 @@ install: all
 	cp -p $(TARGET) $(PREFIX)/lib
 	cp -p *.h *.inl $(PREFIX)/include/lne
 	$(LN) $(PREFIX)/lib/$(TARGET) $(PREFIX)/lib/$(SONAME)
+	$(LN) $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/$(LNNAME)
 
 uninstall:
 	rm -fr $(PREFIX)/include/lne
+	rm -f $(PREFIX)/lib/$(LNNAME)
 	rm -f $(PREFIX)/lib/$(SONAME)
 	rm -f $(PREFIX)/lib/$(TARGET)
 
