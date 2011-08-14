@@ -15,3 +15,21 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+LNE_INLINE
+Available::operator bool(void) const
+{
+	return available_;
+}
+
+LNE_INLINE bool
+Available::IsAvailable(void) const
+{
+	return available_;
+}
+
+LNE_INLINE void
+Available::set_available(bool available)
+{
+	available_ = available;
+}

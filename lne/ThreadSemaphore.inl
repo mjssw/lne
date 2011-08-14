@@ -16,16 +16,10 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-LNE_INLINE
-ThreadSemaphore::operator bool() const
-{
-	return initialized_;
-}
-
 LNE_INLINE LNE_UINT
 ThreadSemaphore::TryAcquire(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return WaitForSingleObject(sem_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
@@ -37,7 +31,7 @@ ThreadSemaphore::TryAcquire(void)
 LNE_INLINE LNE_UINT
 ThreadSemaphore::Acquire(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return WaitForSingleObject(sem_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
@@ -49,7 +43,7 @@ ThreadSemaphore::Acquire(void)
 LNE_INLINE LNE_UINT
 ThreadSemaphore::Release(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return ReleaseSemaphore(sem_, 1, NULL) ? LNERR_OK : LNERR_UNKNOW;

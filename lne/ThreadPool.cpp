@@ -26,10 +26,6 @@ ThreadTask::ThreadTask(void)
 {
 }
 
-ThreadTask::~ThreadTask(void)
-{
-}
-
 ThreadPool::ThreadPool(LNE_UINT init, LNE_UINT limit)
 {
 	init = std::min(init, limit);
@@ -37,23 +33,23 @@ ThreadPool::ThreadPool(LNE_UINT init, LNE_UINT limit)
 	num_thread_ = 0;
 	run_thread_ = 0;
 	limit_thread_ = limit;
-	initialized_ = true;
+	set_available(true);
 	exit_request_ = false;
 	num_tasks_ = 0;
 	tasks_head_ = NULL;
 	tasks_rear_ = NULL;
 	if(!condition_)
-		initialized_ = false;
-	if(initialized_) {
+		set_available(false);
+	if(IsAvailable()) {
 #if defined(LNE_WIN32)
 		threads_ = static_cast<HANDLE *>(malloc(sizeof(HANDLE) * limit));
 #else
 		threads_ = static_cast<pthread_t *>(malloc(sizeof(pthread_t) * limit));
 #endif
 		if(threads_ == NULL)
-			initialized_ = false;
+			set_available(false);
 	}
-	if(initialized_) {
+	if(IsAvailable()) {
 		for(LNE_UINT i = 0; i < init; ++i) {
 #if defined(LNE_WIN32)
 			threads_[i] = CreateThread(NULL, 0, ThreadRoutine, this, 0, NULL);
@@ -65,7 +61,7 @@ ThreadPool::ThreadPool(LNE_UINT init, LNE_UINT limit)
 			++num_thread_;
 		}
 		if(num_thread_ < init)
-			initialized_ = false;
+			set_available(false);
 	}
 }
 
@@ -82,7 +78,7 @@ ThreadPool::~ThreadPool(void)
 #endif
 	}
 	while(tasks_head_) {
-		tasks_rear_ = tasks_head_->get_next();
+		tasks_rear_ = tasks_head_->next_;
 		tasks_head_->Discard();
 		tasks_head_ = tasks_rear_;
 	}
@@ -92,7 +88,7 @@ ThreadPool::~ThreadPool(void)
 
 ThreadPool *ThreadPool::NewInstance(LNE_UINT limit)
 {
-	LNE_ASSERT(limit > 0, NULL);
+	LNE_ASSERT_RETURN(limit > 0, NULL);
 	LNE_UINT init;
 	ThreadPool *retval = NULL;
 	if(limit > 0) {
@@ -100,7 +96,7 @@ ThreadPool *ThreadPool::NewInstance(LNE_UINT limit)
 		try {
 			retval = new ThreadPool(init, limit);
 			if(retval) {
-				if(!retval->initialized_) {
+				if(!retval->IsAvailable()) {
 					delete retval;
 					retval = NULL;
 				}
@@ -124,7 +120,7 @@ LNE_UINT ThreadPool::PostTask(ThreadTask *task)
 	if(tasks_rear_ == NULL)
 		tasks_head_ = tasks_rear_ = task;
 	else {
-		tasks_rear_->set_next(task);
+		tasks_rear_->next_ = task;
 		tasks_rear_ = task;
 	}
 	// auto create worker thread
@@ -170,10 +166,10 @@ void ThreadPool::Service(void)
 			if(tasks_head_) {
 				--num_tasks_;
 				task = tasks_head_;
-				tasks_head_ = task->get_next();
+				tasks_head_ = task->next_;
 				if(tasks_head_ == NULL)
 					tasks_rear_ = NULL;
-				task->set_next(NULL);
+				task->next_ = NULL;
 				++run_thread_;
 			}
 			lock_.Unlock();
@@ -194,10 +190,10 @@ void ThreadPool::Service(void)
 		if(tasks_head_) {
 			--num_tasks_;
 			task = tasks_head_;
-			tasks_head_ = task->get_next();
+			tasks_head_ = task->next_;
 			if(tasks_head_ == NULL)
 				tasks_rear_ = NULL;
-			task->set_next(NULL);
+			task->next_ = NULL;
 		}
 		lock_.Unlock();
 		if(task)

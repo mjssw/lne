@@ -15,3 +15,23 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "SockEventer.h"
+
+LNE_NAMESPACE_USING
+
+SockEventer::SockEventer(void)
+{
+}
+
+void SockEventer::HandleRead(void)
+{
+}
+
+void SockEventer::HandleWrite(void)
+{
+}
+
+void SockEventer::HandleShutdown(void)
+{
+}

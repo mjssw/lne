@@ -19,21 +19,20 @@
 #ifndef LNE_SOCKSTREAM_H
 #define LNE_SOCKSTREAM_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "SockAddr.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockStream
+class LNE_Export SockStream: public Abstract
 {
 public:
-	bool Available(void);
 	LNE_UINT GetSockAddr(SockAddr &addr);
 	LNE_UINT GetPeerAddr(SockAddr &addr);
 
 protected:
 	SockStream(void);
-	virtual ~SockStream(void) = 0;
+	~SockStream(void);
 
 	SOCKET socket_;
 };

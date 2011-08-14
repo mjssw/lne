@@ -16,16 +16,10 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-LNE_INLINE
-ThreadCondition::operator bool(void) const
-{
-	return initialized_;
-}
-
 LNE_INLINE LNE_UINT
 ThreadCondition::Wait(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return WaitForSingleObject(event_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
@@ -45,7 +39,7 @@ ThreadCondition::Wait(void)
 LNE_INLINE LNE_UINT
 ThreadCondition::Signal(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return SetEvent(event_) ? LNERR_OK : LNERR_UNKNOW;

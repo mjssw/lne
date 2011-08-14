@@ -63,13 +63,13 @@ void SockAcceptor::Release(void)
 
 LNE_UINT SockAcceptor::Accept(SockPad &sock, const TimeValue *tv)
 {
-	LNE_ASSERT(socket_ != INVALID_SOCKET, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(socket_ != INVALID_SOCKET, LNERR_PARAMETER);
 	if(tv) {
 		fd_set fds;
 		FD_ZERO(&fds);
 		FD_SET(socket_, &fds);
 		TimeValue timeout(*tv);
-		if(select(socket_, &fds, NULL, NULL, (timeval *)timeout) < 1)
+		if(select(static_cast<int>(socket_ + 1), &fds, NULL, NULL, (timeval *)timeout) < 1)
 			return LNERR_TIMEOUT;
 	}
 	sock = accept(socket_, NULL, NULL);

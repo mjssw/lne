@@ -21,7 +21,6 @@
 LNE_NAMESPACE_USING
 
 DataBlockPool::DataBlockPool(void)
-	: lock_(true), reference_count_(1)
 {
 	cache_head_ = NULL;
 	queue_head_ = NULL;
@@ -57,7 +56,7 @@ DataBlockPool::~DataBlockPool(void)
 
 DataBlockPool *DataBlockPool::NewInstance(LNE_UINT capacity, LNE_UINT cache_blocks)
 {
-	LNE_ASSERT(capacity > 0 && cache_blocks > 0, NULL);
+	LNE_ASSERT_RETURN(capacity > 0 && cache_blocks > 0, NULL);
 	char *buffer = static_cast<char *>(malloc(sizeof(DataBlockPool) + sizeof(BlockCache) + sizeof(BlockQueue) * cache_blocks + (sizeof(DataBlock) + capacity) * cache_blocks));
 	if(buffer) {
 		DataBlockPool *pool = new(buffer)DataBlockPool();
@@ -69,47 +68,28 @@ DataBlockPool *DataBlockPool::NewInstance(LNE_UINT capacity, LNE_UINT cache_bloc
 	return NULL;
 }
 
-DataBlockPool *DataBlockPool::AddRef(void)
+void DataBlockPool::HandleDestroy(void)
 {
-	lock_.Lock();
-	++reference_count_;
-	lock_.Unlock();
-	return this;
-}
-
-void DataBlockPool::Release(void)
-{
-	bool can_destroy = false;
-	lock_.Lock();
-	can_destroy = --reference_count_ < 1;
-	lock_.Unlock();
-	if(can_destroy) {
-		this->~DataBlockPool();
-		free(this);
-	}
+	this->~DataBlockPool();
+	free(this);
 }
 
 void DataBlockPool::Free(DataBlock *block)
 {
-	bool can_destroy = false;
-	lock_.Lock();
+	queue_lock_.Lock();
 	BlockQueue *queue = queue_free_;
 	queue_free_ = queue->next;
 	queue->block = block;
 	queue->next = queue_head_;
 	queue_head_ = queue;
-	can_destroy = --reference_count_ < 1;
-	lock_.Unlock();
-	if(can_destroy) {
-		this->~DataBlockPool();
-		free(this);
-	}
+	queue_lock_.Unlock();
+	Release();
 }
 
 DataBlock *DataBlockPool::Alloc(void)
 {
 	DataBlock *result = NULL;
-	lock_.Lock();
+	queue_lock_.Lock();
 	if(queue_head_ == NULL) {
 		char *buffer = static_cast<char *>(malloc(sizeof(BlockCache) + sizeof(BlockQueue) * cache_blocks_ + (sizeof(DataBlock) + capacity_) * cache_blocks_));
 		if(buffer)
@@ -122,9 +102,10 @@ DataBlock *DataBlockPool::Alloc(void)
 		queue->block = NULL;
 		queue->next = queue_free_;
 		queue_free_ = queue;
-		++reference_count_;
 	}
-	lock_.Unlock();
+	queue_lock_.Unlock();
+	if(result)
+		AddRef();
 	return result;
 }
 
@@ -132,7 +113,7 @@ void DataBlockPool::AppendCache(char *buffer)
 {
 	BlockCache *cache = reinterpret_cast<BlockCache *>(buffer);
 	BlockQueue *queue = reinterpret_cast<BlockQueue *>(buffer + sizeof(BlockCache));
-	buffer += sizeof(BlockQueue) * cache_blocks_;
+	buffer += sizeof(BlockCache) + sizeof(BlockQueue) * cache_blocks_;
 	DataBlock *block;
 	for(LNE_UINT i = 0; i < cache_blocks_; ++i) {
 		block = new(buffer) DataBlock();

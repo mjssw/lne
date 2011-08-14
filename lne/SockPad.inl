@@ -32,6 +32,7 @@ SockPad::~SockPad(void)
 LNE_INLINE
 SockPad::SockPad(SockPad &other)
 {
+	socket_ = INVALID_SOCKET;
 	operator=(other);
 }
 

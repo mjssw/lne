@@ -19,13 +19,11 @@
 #ifndef LNE_DATABLOCKPOOL_H
 #define LNE_DATABLOCKPOOL_H
 
-#include "config.h"
 #include "DataBlock.h"
-#include "ThreadLock.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export DataBlockPool
+class LNE_Export DataBlockPool: public RefObject
 {
 	friend class DataBlock;
 	struct BlockQueue {
@@ -40,8 +38,6 @@ public:
 	static const LNE_UINT DEFAULT_CACHE_BLOCKS = 128;
 
 	static DataBlockPool *NewInstance(LNE_UINT capacity = DataBlock::DEFAULT_CAPACITY, LNE_UINT cache_blocks = DEFAULT_CACHE_BLOCKS);
-	DataBlockPool *AddRef(void);
-	void Release(void);
 
 	DataBlock *Alloc(void);
 	LNE_UINT get_capacity(void) const;
@@ -49,6 +45,7 @@ public:
 private:
 	DataBlockPool(void);
 	~DataBlockPool(void);
+	void HandleDestroy(void);
 	void Free(DataBlock *block);
 	void AppendCache(char *buffer);
 
@@ -57,8 +54,7 @@ private:
 	BlockCache *cache_head_;
 	BlockQueue *queue_head_;
 	BlockQueue *queue_free_;
-	ThreadLock lock_;
-	LNE_UINT reference_count_;
+	ThreadLock queue_lock_;
 };
 
 #include "DataBlockPool.inl"

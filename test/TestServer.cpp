@@ -2,7 +2,7 @@
 
 LNE_NAMESPACE_USING
 
-class MyHander: public SockHander
+class MyHander: public SockSprayHander
 {
 public:
 	MyHander() {
@@ -18,8 +18,8 @@ public:
 			printf("accept %s <= %s\n", addr_sock.get_addr_text(), addr_peer.get_addr_text());
 		}
 		DataBlock *blocks[2];
-		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
-		printf("[%u] Recv Data: %u\n", index, block->get_size());
+		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->get_context());
+		printf("[%llu] Recv Data: %u\n", index, block->get_size());
 		blocks[0] = block;
 		blocks[1] = block;
 		client->Send(blocks, 2);
@@ -29,8 +29,8 @@ public:
 	}
 
 	void HandleShutdown(SockSpray *client) {
-		LNE_UINT index = reinterpret_cast<LNE_UINT64>(client->get_context());
-		printf("[%u] Shutdown\n", index);
+		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->get_context());
+		printf("[%llu] Shutdown\n", index);
 		delete this;
 	}
 private:
@@ -46,20 +46,25 @@ void TestServer()
 		printf("acceptor cannot create\n");
 		return;
 	}
-	DataBlockPool *pool = DataBlockPool::NewInstance();
-	SockPoller *poller = SockPoller::NewInstance(pool, 10);
+	SockPoller *poller = SockPoller::NewInstance(10);
 	if(poller == NULL) {
 		printf("poller cannot create\n");
-		pool->Release();
 		acceptor->Release();
 		return;
 	}
 	LNE_UINT count = 0;
 	SockPad sock;
+	SockSpray *spray;
+	DataBlockPool *pool = DataBlockPool::NewInstance();
+	SockSprayFactory factory(pool);
 	while(acceptor->Accept(sock) == LNERR_OK) {
 		if(count > 0)
 			break;
-		poller->Managed(sock, new MyHander(), reinterpret_cast<void *>(++count));
+		spray = factory.Alloc(sock, new MyHander(), reinterpret_cast<void *>(++count));
+		if(spray) {
+			if(poller->Managed(spray) != LNERR_OK)
+				spray->Release();
+		}
 	}
 	pool->Release();
 	poller->Release();

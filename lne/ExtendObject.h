@@ -16,32 +16,31 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_OBJECTSTACK_H
-#define LNE_OBJECTSTACK_H
+#ifndef LNE_EXTENDOBJECT_H
+#define LNE_EXTENDOBJECT_H
 
 #include "BaseObject.h"
-#include "ObjectList_T.h"
+#include "ThreadLock.h"
 
 LNE_NAMESPACE_BEGIN
 
-template<typename T, LNE_UINT cache_nodes_ = 128>
-class ObjectStack
+class LNE_Export RefObject: public Abstract
 {
 public:
-	ObjectStack(void);
-	~ObjectStack(void);
+	void AddRef(void);
+	void Release(void);
 
-	LNE_UINT Pop(T &object);
-	LNE_UINT Push(const T &object);
-
-	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+protected:
+	RefObject(void);
+	void SetRef(LNE_UINT ref);
+	virtual void HandleDestroy() = 0;
 
 private:
-	ObjectList<T, cache_nodes_> list_;
+	ThreadLock lock_;
+	LNE_UINT reference_;
 };
 
-#include "ObjectStack_T.inl"
+#include "ExtendObject.inl"
 
 LNE_NAMESPACE_END
 

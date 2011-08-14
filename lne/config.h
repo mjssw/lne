@@ -72,15 +72,19 @@ typedef unsigned long long LNE_UINT64;
 #include <string.h>
 
 #if defined(NDEBUG)
-#define LNE_ASSERT(f,t) \
+#define LNE_ASSERT_IF(f) \
+	if(!(f))
+#define LNE_ASSERT_RETURN(f,t) \
 	if(!(f)) return t
-#define LNE_ASSERT2(f) \
+#define LNE_ASSERT_RETURN_VOID(f) \
 	if(!(f)) return
 #else
 #include <assert.h>
-#define LNE_ASSERT(f,t) \
+#define LNE_ASSERT_IF(f) \
+	assert(f);
+#define LNE_ASSERT_RETURN(f,t) \
 	assert(f)
-#define LNE_ASSERT2(f) \
+#define LNE_ASSERT_RETURN_VOID(f) \
 	assert(f)
 #endif
 

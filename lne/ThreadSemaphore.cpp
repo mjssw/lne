@@ -24,15 +24,15 @@ ThreadSemaphore::ThreadSemaphore(LNE_UINT count, LNE_UINT max)
 {
 #if defined(LNE_WIN32)
 	sem_ = CreateSemaphore(NULL, count, max, NULL);
-	initialized_ = sem_ != NULL;
+	set_available(sem_ != NULL);
 #else
-	initialized_ = sem_init(&sem_, 0, count) == 0;
+	set_available(sem_init(&sem_, 0, count));
 #endif
 }
 
 ThreadSemaphore::~ThreadSemaphore(void)
 {
-	if(initialized_)
+	if(IsAvailable())
 #if defined(LNE_WIN32)
 		CloseHandle(sem_);
 #else
@@ -42,7 +42,7 @@ ThreadSemaphore::~ThreadSemaphore(void)
 
 LNE_UINT ThreadSemaphore::Acquire(const TimeValue &tv)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	DWORD ret = WaitForSingleObject(sem_, (DWORD)tv.ToMillisecond());

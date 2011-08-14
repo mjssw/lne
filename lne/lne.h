@@ -19,7 +19,6 @@
 #ifndef LNE_H
 #define LNE_H
 
-#include "config.h"
 #include "TimeValue.h"
 #include "ThreadMutex.h"
 #include "ThreadSemaphore.h"
@@ -33,8 +32,6 @@
 #include "SockConnector.h"
 #include "SockSpray.h"
 #include "SockPoller.h"
-#include "ObjectList_T.h"
-#include "ObjectQueue_T.h"
 
 #endif
 

@@ -46,6 +46,10 @@
 #endif
 #define LNE_INLINE __forceinline
 
+typedef HANDLE POLLER;
+const int INVALID_POLLER = NULL;
+#define closepoller(f) CloseHandle(f)
+
 typedef long suseconds_t;
 typedef int ssize_t;
 typedef int socklen_t;

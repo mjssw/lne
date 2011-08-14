@@ -41,4 +41,8 @@ const int INVALID_SOCKET = -1;
 const int SOCKET_ERROR = -1;
 #define closesocket(f) close(f)
 
+typedef int POLLER;
+const int INVALID_POLLER = -1;
+#define closepoller(f) close(f)
+
 #endif

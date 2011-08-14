@@ -19,22 +19,19 @@
 #ifndef LNE_DATABLOCK_H
 #define LNE_DATABLOCK_H
 
-#include "config.h"
-#include "ThreadLock.h"
+#include "ExtendObject.h"
 
 LNE_NAMESPACE_BEGIN
 
 class DataBlockPool;
 
-class LNE_Export DataBlock
+class LNE_Export DataBlock: public RefObject
 {
 	friend class DataBlockPool;
 public:
 	static const LNE_UINT DEFAULT_CAPACITY = 1500;
 
 	static DataBlock *NewInstance(LNE_UINT capacity = DEFAULT_CAPACITY);
-	DataBlock *AddRef(void);
-	void Release(void);
 
 	bool IsFull(void) const;
 	bool IsEmpty(void) const;
@@ -52,13 +49,12 @@ public:
 private:
 	DataBlock(void);
 	~DataBlock(void);
+	void HandleDestroy(void);
 
 	char *buffer_;
 	LNE_UINT size_; // customer variable, <= capacity_
 	LNE_UINT capacity_;
 	DataBlockPool *pool_;
-	ThreadLock lock_;
-	LNE_UINT reference_count_;
 };
 
 #include "DataBlock.inl"

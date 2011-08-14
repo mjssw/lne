@@ -32,7 +32,7 @@ class LNE_Export SockWaves : public SockStream
 	friend class SockAcceptor;
 	friend class SockConnector;
 public:
-	static SockWaves *NewInstance(SockPad& sock);
+	static SockWaves *NewInstance(SockPad sock);
 	void Release();
 	LNE_UINT Send(DataBlock *block);
 	LNE_UINT Recv(DataBlock *block);
@@ -42,8 +42,6 @@ private:
 	SockWaves(void);
 	~SockWaves(void);
 	LNE_UINT Recv(DataBlock *block, const TimeValue *tv);
-
-	ThreadLock lock_;
 };
 
 #include "SockWaves.inl"

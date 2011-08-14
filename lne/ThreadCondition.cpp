@@ -24,18 +24,18 @@ ThreadCondition::ThreadCondition(void)
 {
 #if defined(LNE_WIN32)
 	event_ = CreateEvent(NULL, FALSE, FALSE, NULL);
-	initialized_ = event_ != NULL;
+	set_available(event_ != NULL);
 #else
 	signal_ = false;
 	pthread_mutex_init(&mutex_, NULL);
 	pthread_cond_init(&cond_, NULL);
-	initialized_ = true;
+	set_available(true);
 #endif
 }
 
 ThreadCondition::~ThreadCondition(void)
 {
-	if(initialized_) {
+	if(IsAvailable()) {
 #if defined(LNE_WIN32)
 		CloseHandle(event_);
 #else
@@ -47,7 +47,7 @@ ThreadCondition::~ThreadCondition(void)
 
 LNE_UINT ThreadCondition::Wait(const TimeValue &tv)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	DWORD ret = WaitForSingleObject(event_, (DWORD)tv.ToMillisecond());

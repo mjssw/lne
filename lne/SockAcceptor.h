@@ -19,7 +19,7 @@
 #ifndef LNE_SOCKACCEPTOR_H
 #define LNE_SOCKACCEPTOR_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "SockWaves.h"
 
 LNE_NAMESPACE_BEGIN
@@ -32,11 +32,11 @@ public:
 
 	LNE_UINT Accept(SockPad& sock);
 	LNE_UINT Accept(SockPad& sock, const TimeValue &tv);
+	LNE_UINT Accept(SockPad& sock, const TimeValue *tv);
 
 private:
 	SockAcceptor(void);
 	~SockAcceptor(void);
-	LNE_UINT Accept(SockPad& sock, const TimeValue *tv);
 
 	SOCKET socket_;
 	bool use_timeout_;

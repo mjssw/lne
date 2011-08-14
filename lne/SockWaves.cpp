@@ -28,9 +28,9 @@ SockWaves::~SockWaves(void)
 {
 }
 
-SockWaves *SockWaves::NewInstance(SockPad &sock)
+SockWaves *SockWaves::NewInstance(SockPad sock)
 {
-	LNE_ASSERT(sock, NULL);
+	LNE_ASSERT_RETURN(sock, NULL);
 	SockWaves *result = NULL;
 	try {
 		result = new SockWaves();
@@ -47,7 +47,7 @@ void SockWaves::Release()
 
 LNE_UINT SockWaves::Send(DataBlock *block)
 {
-	LNE_ASSERT(block != NULL && block->get_size() > 0, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(block != NULL && block->get_size() > 0, LNERR_PARAMETER);
 	ssize_t len;
 #if defined(LNE_WIN32)
 	len = send(socket_, block->get_buffer(), block->get_size(), 0);
@@ -63,13 +63,13 @@ LNE_UINT SockWaves::Send(DataBlock *block)
 
 LNE_UINT SockWaves::Recv(DataBlock *block, const TimeValue *tv)
 {
-	LNE_ASSERT(block != NULL && block->get_capacity() > 0, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(block != NULL && block->get_capacity() > 0, LNERR_PARAMETER);
 	if(tv) {
 		fd_set fds;
 		FD_ZERO(&fds);
 		FD_SET(socket_, &fds);
 		TimeValue timeout(*tv);
-		if(select(socket_ + 1, &fds, NULL, NULL, static_cast<timeval *>(timeout)) < 1)
+		if(select(static_cast<int>(socket_ + 1), &fds, NULL, NULL, static_cast<timeval *>(timeout)) < 1)
 			return LNERR_TIMEOUT;
 	}
 	ssize_t len;

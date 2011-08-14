@@ -17,7 +17,7 @@
  */
 
 
-LNE_INLINE SockHander *
+LNE_INLINE SockSprayHander *
 SockSpray::get_hander(void)
 {
 	return hander_;
@@ -28,3 +28,10 @@ SockSpray::get_context(void)
 {
 	return context_;
 }
+
+LNE_INLINE
+SockSprayFactory::SockSprayFactory(DataBlockPool *pool, LNE_UINT limit_write_cache)
+	: pool_(pool), limit_write_cache_(limit_write_cache)
+{
+}
+

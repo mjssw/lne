@@ -85,6 +85,18 @@
     <ClInclude Include="SockPoller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SockEventer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtendObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SockObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Thread.cpp">
@@ -133,6 +145,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockPoller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SockEventer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SockObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -189,6 +213,18 @@
       <Filter>Inline Files</Filter>
     </None>
     <None Include="ThreadPool.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SockEventer.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="BaseObject.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="ExtendObject.inl">
+      <Filter>Inline Files</Filter>
+    </None>
+    <None Include="SockObject.inl">
       <Filter>Inline Files</Filter>
     </None>
   </ItemGroup>

@@ -20,38 +20,34 @@
 
 LNE_NAMESPACE_USING
 
-SockPoller::SockPoller(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache)
-	: lock_(true), reference_count_(1)
+SockPoller::SockPoller(LNE_UINT workers)
+	: lock_(true)
 {
-	pool_ = pool;
-	thread_workers_ = 0;
-	limit_cache_ = limit_cache;
 	threads_ = NULL;
-	initialized_ = true;
+	thread_workers_ = 0;
 	exit_request_ = false;
+	set_available(true);
 	//create poller
 #if defined(LNE_WIN32)
 	poller_ = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
-	if(poller_ == NULL)
 #elif defined(LNE_LINUX)
 	poller_ = epoll_create(1);
-	if(poller_ < 0)
 #elif defined(LNE_FREEBSD)
 	poller_ = kqueue();
-	if(poller_ < 0)
 #endif
-		initialized_ = false;
+	if(poller_ == INVALID_POLLER)
+		set_available(false);
 	//create thread pool
-	if(initialized_) {
+	if(IsAvailable()) {
 #if defined(LNE_WIN32)
 		threads_ = static_cast<HANDLE *>(malloc(sizeof(HANDLE) * workers));
 #else
 		threads_ = static_cast<pthread_t *>(malloc(sizeof(pthread_t) * workers));
 #endif
 		if(threads_ == NULL)
-			initialized_ = false;
+			set_available(false);
 	}
-	if(initialized_) {
+	if(IsAvailable()) {
 		for(LNE_UINT i = 0; i < workers; ++i) {
 #if defined(LNE_WIN32)
 			threads_[i] = CreateThread(NULL, 0, ThreadRoutine, this, 0, NULL);
@@ -63,7 +59,7 @@ SockPoller::SockPoller(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cac
 			++thread_workers_;
 		}
 		if(thread_workers_ < workers)
-			initialized_ = false;
+			set_available(false);
 	}
 }
 
@@ -78,28 +74,20 @@ SockPoller::~SockPoller(void)
 		pthread_join(threads_[i], NULL);
 #endif
 	}
-#if defined(LNE_WIN32)
-	if(poller_ != NULL)
-		CloseHandle(poller_);
-#else
-	if(poller_ != -1)
-		close(poller_);
-#endif
+	if(poller_ != INVALID_POLLER)
+		closepoller(poller_);
 	if(threads_)
 		free(threads_);
-	SockSpray *client;
-	while(clients_free_.Pop(client) == LNERR_OK)
-		delete client;
 }
 
-SockPoller *SockPoller::NewInstance(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache)
+SockPoller *SockPoller::NewInstance(LNE_UINT workers)
 {
-	LNE_ASSERT(pool != NULL && workers > 0, NULL);
+	LNE_ASSERT_RETURN(workers > 0, NULL);
 	SockPoller *retval = NULL;
 	try {
-		retval = new SockPoller(pool, workers, limit_cache);
+		retval = new SockPoller(workers);
 		if(retval) {
-			if(!retval->initialized_) {
+			if(!retval->IsAvailable()) {
 				delete retval;
 				retval = NULL;
 			}
@@ -109,56 +97,15 @@ SockPoller *SockPoller::NewInstance(DataBlockPool *pool, LNE_UINT workers, LNE_U
 	return retval;
 }
 
-void SockPoller::Release(void)
+void SockPoller::HandleDestroy(void)
 {
-	bool can_destroy = false;
-	lock_.Lock();
-	can_destroy = --reference_count_ < 1;
-	lock_.Unlock();
-	if(can_destroy)
-		delete this;
+	delete this;
 }
 
-LNE_UINT SockPoller::Managed(SockPad &sock, SockHander *hander, void *context)
+LNE_UINT SockPoller::Managed(SockEventer *eventer)
 {
-	LNE_ASSERT(sock && hander != NULL, LNERR_PARAMETER);
-	SockSpray *client  = NULL;
-	lock_.Lock();
-	if(clients_free_.Pop(client) != LNERR_OK) {
-		try {
-			client = new SockSpray(this, limit_cache_);
-		} catch(std::bad_alloc) {
-		}
-	}
-	lock_.Unlock();
-	if(client == NULL)
-		return LNERR_NOMEMORY;
-	client->socket_ = sock.Detach();
-	client->hander_ = hander;
-	client->context_ = context;
-	client->poller_ = poller_;
-	LNE_UINT result = client->Apply();
-	lock_.Lock();
-	if(result == LNERR_OK)
-		++reference_count_;
-	else if(clients_free_.Push(client) != LNERR_OK)
-		delete client;
-	lock_.Unlock();
-	return result;
-}
-
-void SockPoller::FreeSock(SockSpray *client)
-{
-	LNE_ASSERT2(client != NULL);
-	client->Clean();
-	bool can_destroy = false;
-	lock_.Lock();
-	if(clients_free_.Push(client) != LNERR_OK)
-		delete client;
-	can_destroy = --reference_count_ < 1;
-	lock_.Unlock();
-	if(can_destroy)
-		delete this;
+	LNE_ASSERT_RETURN(eventer != NULL, LNERR_PARAMETER);
+	return eventer->Bind(poller_) ? LNERR_OK : LNERR_UNKNOW;
 }
 
 #if defined(LNE_WIN32)
@@ -180,13 +127,13 @@ void SockPoller::Service(void)
 {
 	DWORD bytes;
 	ULONG_PTR key;
-	SockSpray::IOCP_OVERLAPPED *overlap;
+	SockEventer::IOCP_OVERLAPPED *overlap;
 	do {
 		if(GetQueuedCompletionStatus(poller_, &bytes, &key, reinterpret_cast<LPOVERLAPPED *>(&overlap), 500)) {
-			if(overlap->type == SockSpray::IOCP_RECV)
-				overlap->owner->HandleRecv(pool_);
-			else if(overlap->type == SockSpray::IOCP_SEND)
-				overlap->owner->HandleSend();
+			if(overlap->type == SockEventer::IOCP_READ)
+				overlap->owner->HandleRead();
+			else if(overlap->type == SockEventer::IOCP_WRITE)
+				overlap->owner->HandleWrite();
 			else
 				overlap->owner->HandleShutdown();
 		}
@@ -196,16 +143,16 @@ void SockPoller::Service(void)
 void SockPoller::Service(void)
 {
 	int rc;
-	SockSpray *client;
+	SockEventer *client;
 	struct epoll_event event;
 	do {
 		rc = epoll_wait(poller_, &event, 1, 500);
 		if(rc > 0) {
-			client = reinterpret_cast<SockSpray *>(event.data.ptr);
+			client = reinterpret_cast<SockEventer *>(event.data.ptr);
 			if(event.events & EPOLLIN)
-				client->HandleRecv(pool_);
+				client->HandleRead();
 			if(event.events & EPOLLOUT)
-				client->HandleSend();
+				client->HandleWrite();
 			if(event.events & (EPOLLERR | EPOLLHUP))
 				client->HandleShutdown();
 		}
@@ -215,7 +162,7 @@ void SockPoller::Service(void)
 void SockPoller::Service(void)
 {
 	int rc;
-	SockSpray *client;
+	SockEventer *client;
 	struct timespec timeout;
 	struct kevent event, kev;
 	timeout.tv_sec = 0;
@@ -223,16 +170,16 @@ void SockPoller::Service(void)
 	do {
 		rc = kevent(poller_, NULL, 0, &event, 1, &timeout);
 		if(rc > 0) {
-			client = reinterpret_cast<SockSpray *>(event.udata);
+			client = reinterpret_cast<SockEventer *>(event.udata);
 			if(event.flags & (EV_EOF | EV_ERROR)) {
 				EV_SET(&kev, event.ident, event.filter, EV_DELETE, 0, 0, NULL);
 				kevent(poller_, &kev, 1, NULL, 0, NULL);
 				client->HandleShutdown();
 			} else {
 				if(event.filter == EVFILT_READ)
-					client->HandleRecv(pool_);
+					client->HandleRead();
 				else if(event.filter == EVFILT_WRITE)
-					client->HandleSend();
+					client->HandleWrite();
 			}
 		}
 	} while(!exit_request_);

@@ -15,3 +15,25 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "ExtendObject.h"
+
+LNE_NAMESPACE_USING
+
+RefObject::RefObject(void)
+	: lock_(true), reference_(1)
+{
+}
+
+void RefObject::Release(void)
+{
+	bool destroy = false;
+	lock_.Lock();
+	LNE_ASSERT_IF(reference_ > 0) {
+		if(--reference_ < 1)
+			destroy = true;
+	}
+	lock_.Unlock();
+	if(destroy)
+		HandleDestroy();
+}

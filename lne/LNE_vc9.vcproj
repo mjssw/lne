@@ -174,11 +174,19 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\BaseObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DataBlock.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\DataBlockPool.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ExtendObject.cpp"
 				>
 			</File>
 			<File
@@ -195,6 +203,14 @@
 			</File>
 			<File
 				RelativePath=".\SockConnector.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SockEventer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SockObject.cpp"
 				>
 			</File>
 			<File
@@ -248,6 +264,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\BaseObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\config-win32.h"
 				>
 			</File>
@@ -261,6 +281,10 @@
 			</File>
 			<File
 				RelativePath=".\DataBlockPool.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExtendObject.h"
 				>
 			</File>
 			<File
@@ -289,6 +313,14 @@
 			</File>
 			<File
 				RelativePath=".\SockConnector.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SockEventer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SockObject.h"
 				>
 			</File>
 			<File
@@ -350,11 +382,19 @@
 			Name="Inline Files"
 			>
 			<File
+				RelativePath=".\BaseObject.inl"
+				>
+			</File>
+			<File
 				RelativePath=".\DataBlock.inl"
 				>
 			</File>
 			<File
 				RelativePath=".\DataBlockPool.inl"
+				>
+			</File>
+			<File
+				RelativePath=".\ExtendObject.inl"
 				>
 			</File>
 			<File
@@ -379,6 +419,14 @@
 			</File>
 			<File
 				RelativePath=".\SockConnector.inl"
+				>
+			</File>
+			<File
+				RelativePath=".\SockEventer.inl"
+				>
+			</File>
+			<File
+				RelativePath=".\SockObject.inl"
 				>
 			</File>
 			<File

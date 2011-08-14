@@ -19,7 +19,7 @@
 #ifndef LNE_TIMEVALUE_H
 #define LNE_TIMEVALUE_H
 
-#include "config.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 

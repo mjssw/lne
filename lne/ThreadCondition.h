@@ -19,27 +19,22 @@
 #ifndef LNE_THREADCONDITION_H
 #define LNE_THREADCONDITION_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "TimeValue.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadCondition
+class LNE_Export ThreadCondition: public Available, public NonCopyable
 {
 public:
 	ThreadCondition(void);
 	~ThreadCondition(void);
 
-	operator bool(void) const;
 	LNE_UINT Wait(void);
 	LNE_UINT Wait(const TimeValue &tv);;
 	LNE_UINT Signal(void);
 
 private:
-	ThreadCondition(const ThreadCondition &);
-	void operator= (const ThreadCondition &);
-
-	bool initialized_;
 #if defined(LNE_WIN32)
 	HANDLE event_;
 #else

@@ -16,16 +16,10 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-LNE_INLINE
-ThreadMutex::operator bool(void) const
-{
-	return initialized_;
-}
-
 LNE_INLINE LNE_UINT
 ThreadMutex::TryAcquire(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return WaitForSingleObject(mutex_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
@@ -37,7 +31,7 @@ ThreadMutex::TryAcquire(void)
 LNE_INLINE LNE_UINT
 ThreadMutex::Acquire(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return WaitForSingleObject(mutex_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
@@ -49,7 +43,7 @@ ThreadMutex::Acquire(void)
 LNE_INLINE LNE_UINT
 ThreadMutex::Release(void)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	return ReleaseMutex(mutex_) ? LNERR_OK : LNERR_UNKNOW;

@@ -49,7 +49,7 @@ void SockConnector::Release(void)
 	delete this;
 }
 
-LNE_UINT SockConnector::Connect(SockPad& sock, const SockAddr &addr, const TimeValue *tv)
+LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeValue *tv)
 {
 	LNE_UINT result = LNERR_UNKNOW;
 	sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
@@ -67,7 +67,7 @@ LNE_UINT SockConnector::Connect(SockPad& sock, const SockAddr &addr, const TimeV
 				FD_ZERO(&fds);
 				FD_SET((SOCKET)sock, &fds);
 				TimeValue timeout(*tv);
-				if(select((SOCKET)sock + 1, NULL, &fds, NULL, static_cast<timeval *>(timeout)) < 1)
+				if(select(static_cast<int>((SOCKET)sock + 1), NULL, &fds, NULL, static_cast<timeval *>(timeout)) < 1)
 					result = LNERR_TIMEOUT;
 				else {
 #if defined(LNE_WIN32)

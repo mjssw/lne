@@ -16,33 +16,46 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_OBJECTSTACK_H
-#define LNE_OBJECTSTACK_H
+#include "SockObject.h"
 
-#include "BaseObject.h"
-#include "ObjectList_T.h"
+LNE_NAMESPACE_USING
 
-LNE_NAMESPACE_BEGIN
-
-template<typename T, LNE_UINT cache_nodes_ = 128>
-class ObjectStack
+void SockPoolable::HandleDestroy(void)
 {
-public:
-	ObjectStack(void);
-	~ObjectStack(void);
+	Clean();
+	if(factory_) {
+		SetRef(1);
+		factory_->PushObject(this);
+	} else
+		delete this;
+}
 
-	LNE_UINT Pop(T &object);
-	LNE_UINT Push(const T &object);
+SockFactory::SockFactory(LNE_UINT limit_cache)
+{
+	limit_cache_ = limit_cache;
+}
 
-	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+SockFactory::~SockFactory(void)
+{
+	SockPoolable *object;
+	while(objects_.Pop(object) == LNERR_OK)
+		delete object;
+}
 
-private:
-	ObjectList<T, cache_nodes_> list_;
-};
+void SockFactory::PushObject(SockPoolable *object)
+{
+	lock_.Lock();
+	if(objects_.get_count() > limit_cache_ || objects_.Push(object) != LNERR_OK)
+		delete object;
+	lock_.Unlock();
+}
 
-#include "ObjectStack_T.inl"
-
-LNE_NAMESPACE_END
-
-#endif
+SockPoolable *SockFactory::PopObject(void)
+{
+	SockPoolable *object;
+	lock_.Lock();
+	if(objects_.Pop(object) != LNERR_OK)
+		object = NULL;
+	lock_.Unlock();
+	return object;
+}

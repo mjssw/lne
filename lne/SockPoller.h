@@ -19,44 +19,32 @@
 #ifndef LNE_SOCKPOLLER_H
 #define LNE_SOCKPOLLER_H
 
-#include "config.h"
-#include "SockSpray.h"
-#include "SockWaves.h"
-#include "DataBlockPool.h"
-#include "ObjectStack_T.h"
+#include "ExtendObject.h"
+#include "SockEventer.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockPoller: private SockManager
+class LNE_Export SockPoller: public RefObject, public Available
 {
 public:
-	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
+	static SockPoller *NewInstance(LNE_UINT workers);
 
-	static SockPoller *NewInstance(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache = DEFAULT_LIMIT_CACHE);
-	void Release(void);
-
-	LNE_UINT Managed(SockPad& sock, SockHander *hander, void *context = NULL);
+	LNE_UINT Managed(SockEventer* eventer);
 
 private:
-	SockPoller(DataBlockPool *pool, LNE_UINT workers, LNE_UINT limit_cache);
+	SockPoller(LNE_UINT workers);
 	~SockPoller(void);
 	void Service(void);
-	void FreeSock(SockSpray *client);
+	void HandleDestroy();
 
-	DataBlockPool *pool_;
-	bool initialized_;
-	bool exit_request_;
 	ThreadLock lock_;
-	LNE_UINT reference_count_;
+	bool exit_request_;
 	LNE_UINT thread_workers_;
-	LNE_UINT limit_cache_;
-	ObjectStack<SockSpray *, 1000> clients_free_;
+	POLLER poller_;
 #if defined(LNE_WIN32)
-	HANDLE poller_;
 	HANDLE *threads_;
 	static DWORD WINAPI ThreadRoutine(LPVOID parameter);
 #else
-	int poller_;
 	pthread_t *threads_;
 	static void *ThreadRoutine(void *parameter);
 #endif

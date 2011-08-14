@@ -19,7 +19,7 @@
 #ifndef LNE_OBJECTQUEUE_H
 #define LNE_OBJECTQUEUE_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "ObjectList_T.h"
 
 LNE_NAMESPACE_BEGIN

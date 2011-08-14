@@ -19,6 +19,7 @@
 #ifndef LNE_THREADPOOL_H
 #define LNE_THREADPOOL_H
 
+#include "BaseObject.h"
 #include "ThreadLock.h"
 #include "ThreadCondition.h"
 
@@ -26,23 +27,19 @@ LNE_NAMESPACE_BEGIN
 
 class ThreadPool;
 
-class LNE_Export ThreadTask
+class LNE_Export ThreadTask: public Abstract, public NonCopyable
 {
 	friend class ThreadPool;
 public:
 	ThreadTask(void);
-	virtual ~ThreadTask(void);
 	virtual void Service(void) = 0;
 	virtual void Discard(void) = 0;
 
 private:
-	ThreadTask *get_next(void);
-	void set_next(ThreadTask *next);
-
 	ThreadTask *next_;
 };
 
-class LNE_Export ThreadPool
+class LNE_Export ThreadPool: public Available
 {
 public:
 	static ThreadPool *NewInstance(LNE_UINT limit);
@@ -55,7 +52,6 @@ private:
 	~ThreadPool(void);
 	void Service(void);
 
-	bool initialized_;
 	bool exit_request_;
 	LNE_UINT num_thread_;
 	LNE_UINT run_thread_;

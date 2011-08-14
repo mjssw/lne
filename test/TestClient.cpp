@@ -21,7 +21,7 @@ void TestClient()
 	const char *query = "GET / HTTP/1.1\r\n\r\n";
 	DataBlock *block = DataBlock::NewInstance(1024 * 1024);
 	strcpy(block->get_buffer(), query);
-	block->set_size(strlen(block->get_buffer()));
+	block->set_size(static_cast<LNE_UINT>(strlen(block->get_buffer())));
 	stream->Send(block);
 	while(stream->Recv(block, tv) == LNERR_OK) {
 		block->get_buffer()[block->get_size()] = '\0';

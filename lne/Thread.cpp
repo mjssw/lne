@@ -20,13 +20,8 @@
 
 LNE_NAMESPACE_USING
 
-Runnable::~Runnable()
-{
-}
-
 Thread::Thread(Runnable *run)
 {
-	initialized_ = false;
 	run_ = run;
 }
 
@@ -47,7 +42,7 @@ void Thread::Release(void)
 
 LNE_UINT Thread::Active(void)
 {
-	if(initialized_)
+	if(IsAvailable())
 		return LNERR_REENTRY;
 #if defined(LNE_WIN32)
 	DWORD tid;
@@ -60,14 +55,14 @@ LNE_UINT Thread::Active(void)
 		return LNERR_UNKNOW;
 	}
 #endif
-	initialized_ = true;
+	set_available(true);
 	return LNERR_OK;
 }
 
 LNE_UINT Thread::Wait(void)
 {
 	run_->Terminate();
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	if(WaitForSingleObject(handle_, INFINITE) != WAIT_OBJECT_0)
@@ -76,7 +71,7 @@ LNE_UINT Thread::Wait(void)
 #else
 	pthread_join(thread_, NULL);
 #endif
-	initialized_ = false;
+	set_available(false);
 	return LNERR_OK;
 }
 

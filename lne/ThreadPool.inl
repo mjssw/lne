@@ -15,15 +15,3 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-LNE_INLINE ThreadTask *
-ThreadTask::get_next(void)
-{
-	return next_;
-}
-
-LNE_INLINE void
-ThreadTask::set_next(ThreadTask *next)
-{
-	next_ = next;
-}

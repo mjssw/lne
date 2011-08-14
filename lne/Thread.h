@@ -19,19 +19,18 @@
 #ifndef LNE_THREAD_H
 #define LNE_THREAD_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "TimeValue.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export Runnable {
+class LNE_Export Runnable :public Abstract{
 public:
-	virtual ~Runnable() = 0;
 	virtual void Service(void) = 0;
 	virtual void Terminate(void) = 0;
 };
 
-class LNE_Export Thread
+class LNE_Export Thread: public Available, public NonCopyable
 {
 public:
 	static Thread* NewInstance(Runnable* run);
@@ -44,12 +43,8 @@ public:
 private:
 	Thread(Runnable* run);
 	~Thread(void);
-	Thread(const Thread&);
-	void operator= (const Thread&);
 
 	Runnable* run_;
-	bool initialized_;
-
 #if defined(LNE_WIN32)
 	HANDLE handle_;
 	static DWORD WINAPI ThreadRoutine(LPVOID parameter);

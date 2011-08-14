@@ -19,28 +19,23 @@
 #ifndef LNE_THREADMUTEX_H
 #define LNE_THREADMUTEX_H
 
-#include "config.h"
+#include "BaseObject.h"
 #include "TimeValue.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadMutex
+class LNE_Export ThreadMutex: public Available,public NonCopyable
 {
 public:
 	ThreadMutex(void);
 	~ThreadMutex(void);
 
-	operator bool(void) const;
 	LNE_UINT TryAcquire(void);
 	LNE_UINT Acquire(void);
 	LNE_UINT Acquire(const TimeValue& tv);;
 	LNE_UINT Release(void);
 
 private:
-	ThreadMutex(const ThreadMutex&);
-	void operator= (const ThreadMutex&);
-
-	bool initialized_;
 #if defined(LNE_WIN32)
 	HANDLE mutex_;
 #else

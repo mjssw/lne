@@ -19,11 +19,11 @@
 #ifndef LNE_THREADLOCK_H
 #define LNE_THREADLOCK_H
 
-#include "config.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadLock
+class LNE_Export ThreadLock: public NonCopyable
 {
 public:
 	ThreadLock(bool fast_mode = false);
@@ -33,12 +33,9 @@ public:
 	void Unlock(void);
 
 private:
-	ThreadLock(const ThreadLock &);
-	void operator= (const ThreadLock &);
 #if !defined(LNE_WIN32)
 	static int pthread_mutex_spinlock(pthread_mutex_t *mutex, int spin_count);
 #endif
-
 #if defined(LNE_WIN32)
 	CRITICAL_SECTION lock_;
 #else

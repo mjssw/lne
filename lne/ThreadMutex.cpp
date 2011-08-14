@@ -24,20 +24,20 @@ ThreadMutex::ThreadMutex(void)
 {
 #if defined(LNE_WIN32)
 	mutex_ = CreateMutex(NULL, FALSE, NULL);
-	initialized_ = mutex_ != NULL;
+	set_available(mutex_ != NULL);
 #else
 	pthread_mutexattr_t attr;
 	pthread_mutexattr_init(&attr);
 	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 	pthread_mutex_init(&mutex_, &attr);
 	pthread_mutexattr_destroy(&attr);
-	initialized_ = true;
+	set_available(true);
 #endif
 }
 
 ThreadMutex::~ThreadMutex(void)
 {
-	if(initialized_)
+	if(IsAvailable())
 #if defined(LNE_WIN32)
 		CloseHandle(mutex_);
 #else
@@ -47,7 +47,7 @@ ThreadMutex::~ThreadMutex(void)
 
 LNE_UINT ThreadMutex::Acquire(const TimeValue &tv)
 {
-	if(!initialized_)
+	if(!IsAvailable())
 		return LNERR_NOINIT;
 #if defined(LNE_WIN32)
 	DWORD ret = WaitForSingleObject(mutex_, (DWORD)tv.ToMillisecond());

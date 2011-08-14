@@ -16,32 +16,34 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_OBJECTSTACK_H
-#define LNE_OBJECTSTACK_H
+#ifndef LNE_SOCKEVENTER_H
+#define LNE_SOCKEVENTER_H
 
 #include "BaseObject.h"
-#include "ObjectList_T.h"
 
 LNE_NAMESPACE_BEGIN
 
-template<typename T, LNE_UINT cache_nodes_ = 128>
-class ObjectStack
+class LNE_Export SockEventer: public Abstract
 {
 public:
-	ObjectStack(void);
-	~ObjectStack(void);
+#if defined(LNE_WIN32)
+	enum {IOCP_WRITE = 0, IOCP_READ = 1, IOCP_SHUTDOWN = 2};
+	typedef struct : public WSAOVERLAPPED{
+		WSAOVERLAPPED overlap;
+		DWORD type;
+		SockEventer *owner;
+	}	IOCP_OVERLAPPED;
+#endif
 
-	LNE_UINT Pop(T &object);
-	LNE_UINT Push(const T &object);
-
-	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
-
-private:
-	ObjectList<T, cache_nodes_> list_;
+public:
+	SockEventer(void);
+	virtual bool Bind(POLLER poller) = 0;
+	virtual void HandleRead(void);
+	virtual void HandleWrite(void);
+	virtual void HandleShutdown(void);
 };
 
-#include "ObjectStack_T.inl"
+#include "SockEventer.inl"
 
 LNE_NAMESPACE_END
 

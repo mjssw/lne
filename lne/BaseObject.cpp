@@ -16,33 +16,23 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_OBJECTSTACK_H
-#define LNE_OBJECTSTACK_H
-
 #include "BaseObject.h"
-#include "ObjectList_T.h"
 
-LNE_NAMESPACE_BEGIN
+LNE_NAMESPACE_USING
 
-template<typename T, LNE_UINT cache_nodes_ = 128>
-class ObjectStack
+Abstract::Abstract(void)
 {
-public:
-	ObjectStack(void);
-	~ObjectStack(void);
+}
 
-	LNE_UINT Pop(T &object);
-	LNE_UINT Push(const T &object);
+Abstract::~Abstract(void)
+{
+}
 
-	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+NonCopyable::NonCopyable(void)
+{
+}
 
-private:
-	ObjectList<T, cache_nodes_> list_;
-};
-
-#include "ObjectStack_T.inl"
-
-LNE_NAMESPACE_END
-
-#endif
+Available::Available(void)
+{
+	available_ = false;
+}

@@ -16,32 +16,48 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_OBJECTSTACK_H
-#define LNE_OBJECTSTACK_H
+#ifndef LNE_SOCKOBJECT_H
+#define LNE_SOCKOBJECT_H
 
-#include "BaseObject.h"
-#include "ObjectList_T.h"
+#include "ExtendObject.h"
+#include "ObjectStack_T.h"
 
 LNE_NAMESPACE_BEGIN
 
-template<typename T, LNE_UINT cache_nodes_ = 128>
-class ObjectStack
+class SockFactory;
+
+class LNE_Export SockPoolable : public RefObject
 {
 public:
-	ObjectStack(void);
-	~ObjectStack(void);
+	SockPoolable(SockFactory *factory);
 
-	LNE_UINT Pop(T &object);
-	LNE_UINT Push(const T &object);
-
-	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+protected:
+	void HandleDestroy(void);
+	virtual void Clean(void) = 0;
 
 private:
-	ObjectList<T, cache_nodes_> list_;
+	SockFactory *factory_;
 };
 
-#include "ObjectStack_T.inl"
+class LNE_Export SockFactory: public Abstract
+{
+	friend class SockPoolable;
+	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
+public:
+	SockFactory(LNE_UINT limit_cache = DEFAULT_LIMIT_CACHE);
+	~SockFactory(void);
+
+protected:
+	void PushObject(SockPoolable* object);
+	SockPoolable* PopObject(void);
+
+private:
+	ThreadLock lock_;
+	LNE_UINT limit_cache_;
+	ObjectStack<SockPoolable *>  objects_;
+};
+
+#include "SockObject.inl"
 
 LNE_NAMESPACE_END
 

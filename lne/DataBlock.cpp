@@ -22,7 +22,6 @@
 LNE_NAMESPACE_USING
 
 DataBlock::DataBlock(void)
-	: lock_(true), reference_count_(1)
 {
 	size_ = 0;
 	buffer_ = NULL;
@@ -36,7 +35,7 @@ DataBlock::~DataBlock(void)
 
 DataBlock *DataBlock::NewInstance(LNE_UINT capacity)
 {
-	LNE_ASSERT(capacity > 0, NULL);
+	LNE_ASSERT_RETURN(capacity > 0, NULL);
 	char *buffer = static_cast<char *>(malloc(sizeof(DataBlock) + capacity));
 	if(buffer) {
 		DataBlock *block = new(buffer)DataBlock();
@@ -47,28 +46,14 @@ DataBlock *DataBlock::NewInstance(LNE_UINT capacity)
 	return NULL;
 }
 
-DataBlock *DataBlock::AddRef(void)
+void DataBlock::HandleDestroy(void)
 {
-	lock_.Lock();
-	++reference_count_;
-	lock_.Unlock();
-	return this;
-}
-
-void DataBlock::Release(void)
-{
-	bool can_destroy = false;
-	lock_.Lock();
-	can_destroy = --reference_count_ < 1;
-	lock_.Unlock();
-	if(can_destroy) {
-		if(pool_) {
-			size_ = 0;
-			reference_count_ = 1;
-			pool_->Free(this);
-		} else {
-			this->~DataBlock();
-			free(this);
-		}
+	if(pool_) {
+		size_ = 0;
+		SetRef(1);
+		pool_->Free(this);
+	} else {
+		this->~DataBlock();
+		free(this);
 	}
 }
