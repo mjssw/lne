@@ -6,6 +6,15 @@
 OSMACRO := $(shell sh -c './osmacro.sh')
 VERSION := $(shell sh -c './version.sh')
 
+CC = g++
+LN = ln -sf
+CFLAGS += -Wall -fPIC
+LDFLAGS += -shared -pthread
+PREFIX = /usr
+SONAME = liblne.so
+TARGET = $(SONAME).$(VERSION)
+OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+
 ifeq ($(RELEASE),y)
 	CFLAGS += -O3 -DNDEBUG
 	LDFLAGS += -s
@@ -13,19 +22,9 @@ else
 	CFLAGS += -g -ggdb -rdynamic
 endif
 
-CC = g++
-LN = ln -sf
-CFLAGS += -Wall -fPIC
-LDFLAGS += -shared -pthread
-SONAME = liblne.so
-TARGET = $(SONAME).$(VERSION)
-PREFIX = /usr
-
-OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
-
 all: $(TARGET)
 
-%.o: %.cpp
+%.o: %.cpp %.inl %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS)
