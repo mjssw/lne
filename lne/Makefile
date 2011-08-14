@@ -5,13 +5,14 @@
 # generate config-os.h
 OSMACRO := $(shell sh -c './osmacro.sh')
 VERSION := $(shell sh -c './version.sh')
+MAJORVN := $(firstword $(subst ., ,$(VERSION)))
 
 CC = g++
 LN = ln -sf
 CFLAGS += -Wall -fPIC
 LDFLAGS += -shared -pthread
 PREFIX = /usr
-SONAME = liblne.so
+SONAME = liblne.so.$(MAJORVN)
 TARGET = $(SONAME).$(VERSION)
 OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
@@ -25,6 +26,10 @@ endif
 all: $(TARGET)
 
 %.o: %.cpp %.inl %.h
+	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.cpp %.h
+	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS)
