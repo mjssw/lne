@@ -59,3 +59,8 @@ SockPoolable *SockFactory::PopObject(void)
 	lock_.Unlock();
 	return object;
 }
+
+void SockFactory::HandleDestroy(void)
+{
+	delete this;
+}

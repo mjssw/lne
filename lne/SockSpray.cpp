@@ -23,8 +23,8 @@ LNE_NAMESPACE_USING
 
 SockSpray::SockSpray(SockFactory *factory)
 	: SockPoolable(factory),
-	  pool_(reinterpret_cast<SockSprayFactory *>(factory)->pool_),
-	  limit_write_cache_(reinterpret_cast<SockSprayFactory *>(factory)->limit_write_cache_),
+	  pool_(dynamic_cast<SockSprayFactory *>(factory)->pool_),
+	  limit_write_cache_(dynamic_cast<SockSprayFactory *>(factory)->limit_write_cache_),
 	  lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {
 	hander_ = NULL;
@@ -49,10 +49,12 @@ SockSpray::SockSpray(SockFactory *factory)
 #elif defined(LNE_FREEBSD)
 	memset(&kevent_data_, 0, sizeof(kevent_data_));
 #endif
+	pool_->AddRef();
 }
 
 SockSpray::~SockSpray(void)
 {
+	pool_->Release();
 }
 
 bool SockSpray::Bind(POLLER poller)
@@ -497,6 +499,25 @@ void SockSpray::LeaveThreadSafe(void)
 		hander_->HandleShutdown(this);
 		Release();
 	}
+}
+
+SockSprayFactory::~SockSprayFactory()
+{
+	pool_->Release();
+}
+
+SockSprayFactory *SockSprayFactory::NewInstance(DataBlockPool *pool, LNE_UINT limit_write_cache, LNE_UINT limit_factroy_cache)
+{
+	LNE_ASSERT_RETURN(pool != NULL && limit_write_cache > 0, NULL);
+	SockSprayFactory *result = NULL;
+	try {
+		result = new SockSprayFactory(limit_factroy_cache);
+		result->pool_ = pool;
+		result->pool_->AddRef();
+		result->limit_write_cache_ = limit_write_cache;
+	} catch(std::bad_alloc) {
+	}
+	return result;
 }
 
 SockSpray *SockSprayFactory::Alloc(SockPad sock, SockSprayHander *hander, void *context)

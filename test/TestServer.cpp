@@ -56,16 +56,17 @@ void TestServer()
 	SockPad sock;
 	SockSpray *spray;
 	DataBlockPool *pool = DataBlockPool::NewInstance();
-	SockSprayFactory factory(pool);
+	SockSprayFactory *factory = SockSprayFactory::NewInstance(pool);
 	while(acceptor->Accept(sock) == LNERR_OK) {
 		if(count > 0)
 			break;
-		spray = factory.Alloc(sock, new MyHander(), reinterpret_cast<void *>(++count));
+		spray = factory->Alloc(sock, new MyHander(), reinterpret_cast<void *>(++count));
 		if(spray) {
 			if(poller->Managed(spray) != LNERR_OK)
 				spray->Release();
 		}
 	}
+	factory->Release();
 	pool->Release();
 	poller->Release();
 	acceptor->Release();

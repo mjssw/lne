@@ -39,15 +39,17 @@ private:
 	SockFactory *factory_;
 };
 
-class LNE_Export SockFactory: public Abstract
+class LNE_Export SockFactory: public RefObject
 {
 	friend class SockPoolable;
-	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
 public:
-	SockFactory(LNE_UINT limit_cache = DEFAULT_LIMIT_CACHE);
+	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
+
+	SockFactory(LNE_UINT limit_cache);
 	~SockFactory(void);
 
 protected:
+	void HandleDestroy(void);
 	void PushObject(SockPoolable* object);
 	SockPoolable* PopObject(void);
 
