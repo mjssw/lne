@@ -45,7 +45,7 @@ public:
 private:
 	DataBlockPool(void);
 	~DataBlockPool(void);
-	void HandleDestroy(void);
+	void ObjectDestroy(void);
 	void Free(DataBlock *block);
 	void AppendCache(char *buffer);
 

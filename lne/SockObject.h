@@ -32,7 +32,7 @@ public:
 	SockPoolable(SockFactory *factory);
 
 protected:
-	void HandleDestroy(void);
+	void ObjectDestroy(void);
 	virtual void Clean(void) = 0;
 
 private:
@@ -49,7 +49,7 @@ public:
 	~SockFactory(void);
 
 protected:
-	void HandleDestroy(void);
+	void ObjectDestroy(void);
 	void PushObject(SockPoolable* object);
 	SockPoolable* PopObject(void);
 
