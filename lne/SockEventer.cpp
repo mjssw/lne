@@ -22,6 +22,7 @@ LNE_NAMESPACE_USING
 
 SockEventer::SockEventer(void)
 {
+	prev_ = next_ = NULL;
 }
 
 void SockEventer::HandleRead(void)
@@ -33,5 +34,9 @@ void SockEventer::HandleWrite(void)
 }
 
 void SockEventer::HandleShutdown(void)
+{
+}
+
+void SockEventer::HandleIdleTimeout(void)
 {
 }

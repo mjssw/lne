@@ -58,8 +58,6 @@ void TestServer()
 	DataBlockPool *pool = DataBlockPool::NewInstance();
 	SockSprayFactory *factory = SockSprayFactory::NewInstance(pool);
 	while(acceptor->Accept(sock) == LNERR_OK) {
-		if(count > 0)
-			break;
 		spray = factory->Alloc(sock, new MyHandler(), reinterpret_cast<void *>(++count));
 		if(spray) {
 			poller->Bind(spray);

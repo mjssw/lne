@@ -15,3 +15,39 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+LNE_INLINE SockEventer *
+SockEventer::get_prev(void)
+{
+	return prev_;
+}
+
+LNE_INLINE void
+SockEventer::set_prev(SockEventer *prev)
+{
+	prev_ = prev;
+}
+
+LNE_INLINE SockEventer *
+SockEventer::get_next(void)
+{
+	return next_;
+}
+
+LNE_INLINE void
+SockEventer::set_next(SockEventer *next)
+{
+	next_ = next;
+}
+
+LNE_INLINE time_t
+SockEventer::get_active(void)
+{
+	return active_;
+}
+
+LNE_INLINE void
+SockEventer::set_active(time_t active)
+{
+	active_ = active;
+}

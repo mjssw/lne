@@ -27,6 +27,7 @@ SockSpray::SockSpray(SockFactory *factory)
 	  limit_write_cache_(dynamic_cast<SockSprayFactory *>(factory)->limit_write_cache_),
 	  lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {
+	enable_idle_check_ = true;
 	handler_ = NULL;
 	context_ = NULL;
 	thread_count_ = 0;
@@ -55,6 +56,11 @@ SockSpray::SockSpray(SockFactory *factory)
 SockSpray::~SockSpray(void)
 {
 	pool_->Release();
+}
+
+bool SockSpray::IdleTimeout(void)
+{
+	return enable_idle_check_;
 }
 
 bool SockSpray::HandleBind(SockPoller *poller)
@@ -109,6 +115,14 @@ void SockSpray::HandleTerminate(void)
 	Release();
 }
 
+void SockSpray::HandleIdleTimeout(void)
+{
+	shutdown_lock_.Lock();
+	__Shutdown();
+	shutdown_lock_.Unlock();
+	enable_idle_check_ = false;
+}
+
 void SockSpray::Clean(void)
 {
 	if(socket_ != INVALID_SOCKET) {
@@ -131,6 +145,7 @@ void SockSpray::Clean(void)
 #elif defined(LNE_FREEBSD)
 	kevent_data_.num_eof = 0;
 #endif
+	enable_idle_check_ = true;
 }
 
 void SockSpray::Send(DataBlock *block)
@@ -505,8 +520,8 @@ void SockSpray::LeaveThreadSafe(void)
 	shutdown_lock_.Unlock();
 	// process shutdown
 	if(num_flag == 2) {
-		handler_->HandleShutdown(this);
 		poller_->UnBind(this);
+		handler_->HandleShutdown(this);
 		Release();
 	}
 }

@@ -40,33 +40,37 @@ public:
 	virtual void HandleShutdown(SockSpray *client) = 0;
 };
 
-class LNE_Export SockSpray: public SockPoolable, public SockStream, public SockEventer
+class LNE_Export SockSpray: public SockEventer, public SockPoolable, public SockStream
 {
 	friend class SockSprayFactory;
 public:
-	bool HandleBind(SockPoller* poller);
-	void HandleTerminate(void);
-
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
 	SockSprayHandler *get_handler(void);
 	void *get_context(void);
 
+protected:
+	bool IdleTimeout(void);
+	void HandleRead(void);
+	void HandleWrite(void);
+	void HandleShutdown(void);
+	bool HandleBind(SockPoller *poller);
+	void HandleTerminate(void);
+	void HandleIdleTimeout(void);
+
 private:
 	SockSpray(SockFactory *factory);
 	~SockSpray(void);
 	void Clean(void);
 	void __Shutdown(void);
-	void HandleWrite(void);
-	void __HandleWrite(void);
-	void HandleRead(void);
 	void __HandleRead(void);
-	void HandleShutdown(void);
+	void __HandleWrite(void);
 	void __HandleShutdown(void);
 	void EnterThreadSafe(void);
 	void LeaveThreadSafe(void);
 
+	bool enable_idle_check_;
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;
 	SockSprayHandler *handler_;
@@ -95,7 +99,7 @@ private:
 		bool already;
 	} shutdown_state_;
 	ThreadLock shutdown_lock_;
-	SockPoller* poller_;
+	SockPoller *poller_;
 #if defined(LNE_WIN32)
 	struct {
 		LNE_INT count;

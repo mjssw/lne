@@ -47,11 +47,26 @@ public:
 
 public:
 	SockEventer(void);
+	virtual bool IdleTimeout(void) = 0;
 	virtual void HandleRead(void);
 	virtual void HandleWrite(void);
 	virtual void HandleShutdown(void);
-	virtual bool HandleBind(SockPoller* poller) = 0;
+	virtual void HandleIdleTimeout(void);
+	virtual bool HandleBind(SockPoller *poller) = 0;
 	virtual void HandleTerminate(void) = 0;
+
+	// only used for SockPoller's implementation
+	SockEventer *get_prev(void);
+	void set_prev(SockEventer *prev);
+	SockEventer *get_next(void);
+	void set_next(SockEventer *prev);
+	time_t get_active(void);
+	void set_active(time_t active);
+
+private:
+	SockEventer *prev_;
+	SockEventer *next_;
+	time_t active_;
 };
 
 #include "SockEventer.inl"
