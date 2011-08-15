@@ -102,10 +102,21 @@ void SockReactor::ObjectDestroy(void)
 	delete this;
 }
 
-LNE_UINT SockReactor::Managed(SockEventer *eventer)
+POLLER SockReactor::Handle(void)
 {
-	LNE_ASSERT_RETURN(eventer != NULL, LNERR_PARAMETER);
-	return eventer->Bind(poller_) ? LNERR_OK : LNERR_UNKNOW;
+	return poller_;
+}
+
+void SockReactor::Bind(SockEventer *eventer)
+{
+	if(!eventer->HandleBind(this)) {
+		eventer->HandleTerminate();
+		return;
+	}
+}
+
+void SockReactor::UnBind(SockEventer *eventer)
+{
 }
 
 #if defined(LNE_WIN32)

@@ -23,12 +23,22 @@
 
 LNE_NAMESPACE_BEGIN
 
+class SockEventer;
+
+class LNE_Export SockPoller: public Abstract
+{
+public:
+	virtual POLLER Handle(void) = 0;
+	virtual void Bind(SockEventer *eventer) = 0;
+	virtual void UnBind(SockEventer *eventer) = 0;
+};
+
 class LNE_Export SockEventer: public Abstract
 {
 public:
 #if defined(LNE_WIN32)
 	enum {IOCP_WRITE = 0, IOCP_READ = 1, IOCP_SHUTDOWN = 2};
-	typedef struct : public WSAOVERLAPPED{
+	typedef struct : public WSAOVERLAPPED {
 		WSAOVERLAPPED overlap;
 		DWORD type;
 		SockEventer *owner;
@@ -37,10 +47,11 @@ public:
 
 public:
 	SockEventer(void);
-	virtual bool Bind(POLLER poller) = 0;
 	virtual void HandleRead(void);
 	virtual void HandleWrite(void);
 	virtual void HandleShutdown(void);
+	virtual bool HandleBind(SockPoller* poller) = 0;
+	virtual void HandleTerminate(void) = 0;
 };
 
 #include "SockEventer.inl"

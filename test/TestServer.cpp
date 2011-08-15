@@ -2,10 +2,10 @@
 
 LNE_NAMESPACE_USING
 
-class MyHander: public SockSprayHander
+class MyHandler: public SockSprayHandler
 {
 public:
-	MyHander() {
+	MyHandler() {
 		count_ = 0;
 		first_ = false;
 	}
@@ -60,10 +60,9 @@ void TestServer()
 	while(acceptor->Accept(sock) == LNERR_OK) {
 		if(count > 0)
 			break;
-		spray = factory->Alloc(sock, new MyHander(), reinterpret_cast<void *>(++count));
+		spray = factory->Alloc(sock, new MyHandler(), reinterpret_cast<void *>(++count));
 		if(spray) {
-			if(poller->Managed(spray) != LNERR_OK)
-				spray->Release();
+			poller->Bind(spray);
 		}
 	}
 	factory->Release();

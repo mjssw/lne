@@ -24,12 +24,14 @@
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockReactor: public RefObject, public Available
+class LNE_Export SockReactor: public RefObject, public Available, public SockPoller
 {
 public:
 	static SockReactor *NewInstance(LNE_UINT workers);
 
-	LNE_UINT Managed(SockEventer* eventer);
+	POLLER Handle(void);
+	void Bind(SockEventer *eventer);
+	void UnBind(SockEventer *eventer);
 
 private:
 	SockReactor(LNE_UINT workers);
