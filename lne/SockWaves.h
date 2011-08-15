@@ -28,7 +28,7 @@ LNE_NAMESPACE_BEGIN
 
 class LNE_Export SockWaves : public SockStream
 {
-	friend class SockPoller;
+	friend class SockReactor;
 	friend class SockAcceptor;
 	friend class SockConnector;
 public:

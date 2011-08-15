@@ -46,7 +46,7 @@ void TestServer()
 		printf("acceptor cannot create\n");
 		return;
 	}
-	SockPoller *poller = SockPoller::NewInstance(10);
+	SockReactor *poller = SockReactor::NewInstance(10);
 	if(poller == NULL) {
 		printf("poller cannot create\n");
 		acceptor->Release();
