@@ -26,9 +26,9 @@ LNE_NAMESPACE_BEGIN
 
 class LNE_Export SockReactor: public RefObject, public Available, public SockPoller
 {
-	static const int EXIT_CHECK_INTERVAL = 5 * 1000;     // millisecond
-	static const int TIMER_INTERVAL = 30;                // second
-	static const int DEFAULT_IDLE_TIMEOUT = 5 * 60 * 60; // second
+	static const time_t EXIT_CHECK_INTERVAL = 5 * 1000;     // millisecond
+	static const time_t TIMER_INTERVAL = 30;                // second
+	static const time_t DEFAULT_IDLE_TIMEOUT = 5 * 60 * 60; // second
 public:
 	static SockReactor *NewInstance(LNE_UINT workers, LNE_UINT idle_timeout = DEFAULT_IDLE_TIMEOUT);
 

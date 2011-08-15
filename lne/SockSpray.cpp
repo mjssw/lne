@@ -34,7 +34,7 @@ SockSpray::SockSpray(SockFactory *factory)
 	memset(&send_state_, 0, sizeof(send_state_));
 	memset(&recv_state_, 0, sizeof(recv_state_));
 	memset(&shutdown_state_, 0, sizeof(shutdown_state_));
-	poller_ = INVALID_POLLER;
+	poller_ = NULL;
 #if defined(LNE_WIN32)
 	memset(&iocp_data_, 0, sizeof(iocp_data_));
 	iocp_data_.overlap[IOCP_READ].type = IOCP_READ;
@@ -133,7 +133,7 @@ void SockSpray::Clean(void)
 		send_state_.cache_buf->Release();
 	while(send_blocks_.Extract(send_state_.cache_buf) == LNERR_OK)
 		send_state_.cache_buf->Release();
-	poller_ = INVALID_POLLER;
+	poller_ = NULL;
 	handler_ = NULL;
 	context_ = NULL;
 	thread_count_ = 0;
