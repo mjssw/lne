@@ -21,8 +21,8 @@
 
 LNE_NAMESPACE_USING
 
-SockReactor::SockReactor(LNE_UINT workers, LNE_UINT idle_timeout)
-	: idle_timeout_(idle_timeout), eventer_lock_(true)
+SockReactor::SockReactor(LNE_UINT workers, LNE_UINT idle_timeout, LNE_UINT exit_check_interval)
+	: idle_timeout_(idle_timeout), exit_check_interval_(exit_check_interval), eventer_lock_(true)
 {
 	eventer_circle_ = NULL;
 	threads_ = NULL;
@@ -91,14 +91,14 @@ SockReactor::~SockReactor(void)
 		free(threads_);
 }
 
-SockReactor *SockReactor::NewInstance(LNE_UINT workers, LNE_UINT idle_timeout)
+SockReactor *SockReactor::NewInstance(LNE_UINT workers, LNE_UINT idle_timeout, LNE_UINT exit_check_interval)
 {
-	LNE_ASSERT_RETURN(workers > 0 && idle_timeout > 0, NULL);
+	LNE_ASSERT_RETURN(workers > 0 && idle_timeout > 0 && exit_check_interval > 0, NULL);
 	SockReactor *retval = NULL;
 	try {
-		if(idle_timeout < TIMER_INTERVAL)
-			idle_timeout = TIMER_INTERVAL;
-		retval = new SockReactor(workers, idle_timeout);
+		if(idle_timeout < exit_check_interval)
+			idle_timeout = exit_check_interval;
+		retval = new SockReactor(workers, idle_timeout, exit_check_interval);
 		if(retval) {
 			if(!retval->IsAvailable()) {
 				delete retval;
@@ -197,26 +197,23 @@ void *SockReactor::ThreadService(void *parameter)
 void SockReactor::Timer(void)
 {
 	SockEventer *next;
-	time_t current, lasttime;
-	time(&lasttime);
+	time_t current;
+	TimeValue timeout(exit_check_interval_, 0);
 	do {
-		if(time(&current) - lasttime > TIMER_INTERVAL) {
-			eventer_lock_.Lock();
-			if(eventer_circle_) {
-				next = eventer_circle_;
-				do {
-					if(next->IdleTimeout() && time(&current) - next->get_active() > idle_timeout_) {
-						next->set_active(current);
-						next->HandleIdleTimeout();
-					}
-					next = next->get_next();
-				} while(next != eventer_circle_);
-			}
-			eventer_lock_.Unlock();
-			time(&lasttime);
+		eventer_lock_.Lock();
+		if(eventer_circle_) {
+			next = eventer_circle_;
+			do {
+				if(next->IdleTimeout() && time(&current) - next->get_active() > idle_timeout_) {
+					next->set_active(current);
+					next->HandleIdleTimeout();
+				}
+				next = next->get_next();
+			} while(next != eventer_circle_);
 		}
+		eventer_lock_.Unlock();
 		if(!exit_request_)
-			Thread::Sleep(TIMER_INTERVAL);
+			Thread::Sleep(timeout);
 	} while(!exit_request_);
 }
 
@@ -225,9 +222,10 @@ void SockReactor::Service(void)
 #if defined(LNE_WIN32)
 	DWORD bytes;
 	ULONG_PTR key;
+	DWORD timeout = exit_check_interval_ * 1000;
 	SockEventer::IOCP_OVERLAPPED *overlap;
 	do {
-		if(GetQueuedCompletionStatus(poller_, &bytes, &key, reinterpret_cast<LPOVERLAPPED *>(&overlap), TIMER_INTERVAL)) {
+		if(GetQueuedCompletionStatus(poller_, &bytes, &key, reinterpret_cast<LPOVERLAPPED *>(&overlap), timeout)) {
 			overlap->owner->set_active(time(NULL));
 			if(overlap->type == SockEventer::IOCP_READ)
 				overlap->owner->HandleRead();
@@ -240,9 +238,10 @@ void SockReactor::Service(void)
 #elif defined(LNE_LINUX)
 	int rc;
 	SockEventer *client;
+	int timeout = exit_check_interval_ * 1000;
 	struct epoll_event event;
 	do {
-		rc = epoll_wait(poller_, &event, 1, TIMER_INTERVAL);
+		rc = epoll_wait(poller_, &event, 1, timeout);
 		if(rc > 0) {
 			client = reinterpret_cast<SockEventer *>(event.data.ptr);
 			client->set_active(time(NULL));
@@ -260,7 +259,7 @@ void SockReactor::Service(void)
 	struct timespec timeout;
 	struct kevent event, kev;
 	timeout.tv_sec = 0;
-	timeout.tv_nsec = TIMER_INTERVAL * 1000000;
+	timeout.tv_nsec = exit_check_interval_ * 1000 * 1000000;
 	do {
 		rc = kevent(poller_, NULL, 0, &event, 1, &timeout);
 		if(rc > 0) {

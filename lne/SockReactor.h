@@ -26,18 +26,17 @@ LNE_NAMESPACE_BEGIN
 
 class LNE_Export SockReactor: public RefObject, public Available, public SockPoller
 {
-	static const time_t EXIT_CHECK_INTERVAL = 5 * 1000;     // millisecond
-	static const time_t TIMER_INTERVAL = 30;                // second
-	static const time_t DEFAULT_IDLE_TIMEOUT = 5 * 60 * 60; // second
+	static const LNE_UINT EXIT_CHECK_INTERVAL = 10;           // second
+	static const LNE_UINT DEFAULT_IDLE_TIMEOUT = 5 * 60 * 60; // second
 public:
-	static SockReactor *NewInstance(LNE_UINT workers, LNE_UINT idle_timeout = DEFAULT_IDLE_TIMEOUT);
+	static SockReactor *NewInstance(LNE_UINT workers, LNE_UINT idle_timeout = DEFAULT_IDLE_TIMEOUT, LNE_UINT exit_check_interval = EXIT_CHECK_INTERVAL);
 
 	POLLER Handle(void);
 	void Bind(SockEventer *eventer);
 	void UnBind(SockEventer *eventer);
 
 private:
-	SockReactor(LNE_UINT workers, LNE_UINT idle_timeout);
+	SockReactor(LNE_UINT workers, LNE_UINT idle_timeout, LNE_UINT exit_check_interval);
 	~SockReactor(void);
 	void Timer(void);
 	void Service(void);
@@ -52,6 +51,7 @@ private:
 
 	POLLER poller_;
 	LNE_UINT idle_timeout_;
+	LNE_UINT exit_check_interval_;
 	ThreadLock eventer_lock_;
 	SockEventer *eventer_circle_;
 #if defined(LNE_WIN32)
