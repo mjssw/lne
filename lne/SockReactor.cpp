@@ -16,11 +16,11 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SockPoller.h"
+#include "SockReactor.h"
 
 LNE_NAMESPACE_USING
 
-SockPoller::SockPoller(LNE_UINT workers)
+SockReactor::SockReactor(LNE_UINT workers)
 	: lock_(true)
 {
 	threads_ = NULL;
@@ -63,7 +63,7 @@ SockPoller::SockPoller(LNE_UINT workers)
 	}
 }
 
-SockPoller::~SockPoller(void)
+SockReactor::~SockReactor(void)
 {
 	exit_request_ = true;
 	for(LNE_UINT i = 0; i < thread_workers_; ++i) {
@@ -80,12 +80,12 @@ SockPoller::~SockPoller(void)
 		free(threads_);
 }
 
-SockPoller *SockPoller::NewInstance(LNE_UINT workers)
+SockReactor *SockReactor::NewInstance(LNE_UINT workers)
 {
 	LNE_ASSERT_RETURN(workers > 0, NULL);
-	SockPoller *retval = NULL;
+	SockReactor *retval = NULL;
 	try {
-		retval = new SockPoller(workers);
+		retval = new SockReactor(workers);
 		if(retval) {
 			if(!retval->IsAvailable()) {
 				delete retval;
@@ -97,33 +97,33 @@ SockPoller *SockPoller::NewInstance(LNE_UINT workers)
 	return retval;
 }
 
-void SockPoller::ObjectDestroy(void)
+void SockReactor::ObjectDestroy(void)
 {
 	delete this;
 }
 
-LNE_UINT SockPoller::Managed(SockEventer *eventer)
+LNE_UINT SockReactor::Managed(SockEventer *eventer)
 {
 	LNE_ASSERT_RETURN(eventer != NULL, LNERR_PARAMETER);
 	return eventer->Bind(poller_) ? LNERR_OK : LNERR_UNKNOW;
 }
 
 #if defined(LNE_WIN32)
-DWORD WINAPI SockPoller::ThreadRoutine(LPVOID parameter)
+DWORD WINAPI SockReactor::ThreadRoutine(LPVOID parameter)
 {
-	((SockPoller *)parameter)->Service();
+	((SockReactor *)parameter)->Service();
 	return 0;
 }
 #else
-void *SockPoller::ThreadRoutine(void *parameter)
+void *SockReactor::ThreadRoutine(void *parameter)
 {
-	((SockPoller *)parameter)->Service();
+	((SockReactor *)parameter)->Service();
 	return (void *)0;
 }
 #endif
 
 #if defined(LNE_WIN32)
-void SockPoller::Service(void)
+void SockReactor::Service(void)
 {
 	DWORD bytes;
 	ULONG_PTR key;
@@ -140,7 +140,7 @@ void SockPoller::Service(void)
 	} while(!exit_request_);
 }
 #elif defined(LNE_LINUX)
-void SockPoller::Service(void)
+void SockReactor::Service(void)
 {
 	int rc;
 	SockEventer *client;
@@ -159,7 +159,7 @@ void SockPoller::Service(void)
 	} while(!exit_request_);
 }
 #elif defined(LNE_FREEBSD)
-void SockPoller::Service(void)
+void SockReactor::Service(void)
 {
 	int rc;
 	SockEventer *client;

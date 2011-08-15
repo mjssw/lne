@@ -82,7 +82,7 @@
     <ClInclude Include="SockSpray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SockPoller.h">
+    <ClInclude Include="SockReactor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SockEventer.h">
@@ -144,7 +144,7 @@
     <ClCompile Include="SockSpray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SockPoller.cpp">
+    <ClCompile Include="SockReactor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockEventer.cpp">
@@ -209,7 +209,7 @@
     <None Include="SockSpray.inl">
       <Filter>Inline Files</Filter>
     </None>
-    <None Include="SockPoller.inl">
+    <None Include="SockReactor.inl">
       <Filter>Inline Files</Filter>
     </None>
     <None Include="ThreadPool.inl">

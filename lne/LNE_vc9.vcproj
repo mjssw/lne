@@ -214,7 +214,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.cpp"
+				RelativePath=".\SockReactor.cpp"
 				>
 			</File>
 			<File
@@ -328,7 +328,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.h"
+				RelativePath=".\SockReactor.h"
 				>
 			</File>
 			<File
@@ -434,7 +434,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SockPoller.inl"
+				RelativePath=".\SockReactor.inl"
 				>
 			</File>
 			<File

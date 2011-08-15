@@ -29,7 +29,7 @@
 LNE_NAMESPACE_BEGIN
 
 class DataBlockPool;
-class SockPoller;
+class SockReactor;
 class SockSpray;
 class SockSprayFactory;
 

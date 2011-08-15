@@ -31,7 +31,7 @@
 #include "SockAcceptor.h"
 #include "SockConnector.h"
 #include "SockSpray.h"
-#include "SockPoller.h"
+#include "SockReactor.h"
 
 #endif
 
