@@ -17,10 +17,10 @@
  */
 
 
-LNE_INLINE SockSprayHander *
-SockSpray::get_hander(void)
+LNE_INLINE SockSprayHandler *
+SockSpray::get_handler(void)
 {
-	return hander_;
+	return handler_;
 }
 
 LNE_INLINE void *

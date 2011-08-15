@@ -33,41 +33,47 @@ class SockReactor;
 class SockSpray;
 class SockSprayFactory;
 
-class LNE_Export SockSprayHander: public Abstract
+class LNE_Export SockSprayHandler: public Abstract
 {
 public:
 	virtual void HandleData(SockSpray *client, DataBlock *block) = 0;
 	virtual void HandleShutdown(SockSpray *client) = 0;
 };
 
-class LNE_Export SockSpray: public SockPoolable, public SockStream, public SockEventer
+class LNE_Export SockSpray: public SockEventer, public SockPoolable, public SockStream
 {
 	friend class SockSprayFactory;
 public:
-	bool Bind(POLLER poller);
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
-	SockSprayHander *get_hander(void);
+	SockSprayHandler *get_handler(void);
 	void *get_context(void);
+
+protected:
+	bool IdleTimeout(void);
+	void HandleRead(void);
+	void HandleWrite(void);
+	void HandleShutdown(void);
+	bool HandleBind(SockPoller *poller);
+	void HandleTerminate(void);
+	void HandleIdleTimeout(void);
 
 private:
 	SockSpray(SockFactory *factory);
 	~SockSpray(void);
 	void Clean(void);
 	void __Shutdown(void);
-	void HandleWrite(void);
-	void __HandleWrite(void);
-	void HandleRead(void);
 	void __HandleRead(void);
-	void HandleShutdown(void);
+	void __HandleWrite(void);
 	void __HandleShutdown(void);
 	void EnterThreadSafe(void);
 	void LeaveThreadSafe(void);
 
+	bool enable_idle_check_;
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;
-	SockSprayHander *hander_;
+	SockSprayHandler *handler_;
 	void *context_;
 	ThreadLock lock_;
 	LNE_UINT thread_count_;
@@ -93,7 +99,7 @@ private:
 		bool already;
 	} shutdown_state_;
 	ThreadLock shutdown_lock_;
-	POLLER poller_;
+	SockPoller *poller_;
 #if defined(LNE_WIN32)
 	struct {
 		LNE_INT count;
@@ -116,7 +122,7 @@ class LNE_Export SockSprayFactory : public SockFactory
 	friend class SockSpray;
 public:
 	static SockSprayFactory *NewInstance(DataBlockPool *pool, LNE_UINT limit_write_cache = 128, LNE_UINT limit_factroy_cache = SockFactory::DEFAULT_LIMIT_CACHE);
-	SockSpray *Alloc(SockPad sock, SockSprayHander *hander, void *context);
+	SockSpray *Alloc(SockPad sock, SockSprayHandler *handler, void *context);
 
 private:
 	SockSprayFactory(LNE_UINT limit_factroy_cache);
