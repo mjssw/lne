@@ -16,8 +16,8 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_SOCKPOLLER_H
-#define LNE_SOCKPOLLER_H
+#ifndef LNE_SOCKREACTOR_H
+#define LNE_SOCKREACTOR_H
 
 #include "ExtendObject.h"
 #include "SockEventer.h"
