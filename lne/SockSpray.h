@@ -122,11 +122,12 @@ class LNE_Export SockSprayFactory : public SockFactory
 	friend class SockSpray;
 public:
 	static SockSprayFactory *NewInstance(DataBlockPool *pool, LNE_UINT limit_write_cache = 128, LNE_UINT limit_factroy_cache = SockFactory::DEFAULT_LIMIT_CACHE);
-	SockSpray *Alloc(SockPad sock, SockSprayHandler *handler, void *context);
+	SockSpray *Alloc(SockPad skpad, SockSprayHandler *handler, void *context);
 
 private:
 	SockSprayFactory(LNE_UINT limit_factroy_cache);
-	~SockSprayFactory();
+	~SockSprayFactory(void);
+	void PushObject(SockPoolable* object);
 
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;

@@ -17,19 +17,19 @@
  */
 
 LNE_INLINE LNE_UINT
-SockConnector::Connect(SockPad& sock)
+SockConnector::Connect(SockPad& skpad)
 {
-	return Connect(sock, addr_, use_timeout_ ? &timeout_ : NULL);
+	return Connect(skpad, addr_, use_timeout_ ? &timeout_ : NULL);
 }
 
 LNE_INLINE LNE_UINT
-SockConnector::Connect(SockPad& sock, const SockAddr &addr)
+SockConnector::Connect(SockPad& skpad, const SockAddr &addr)
 {
-	return Connect(sock, addr, NULL);
+	return Connect(skpad, addr, NULL);
 }
 
 LNE_INLINE LNE_UINT
-SockConnector::Connect(SockPad& sock, const SockAddr &addr, const TimeValue &tv)
+SockConnector::Connect(SockPad& skpad, const SockAddr &addr, const TimeValue &tv)
 {
-	return Connect(sock, addr, &tv);
+	return Connect(skpad, addr, &tv);
 }

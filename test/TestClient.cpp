@@ -11,13 +11,13 @@ void TestClient()
 		printf("connector cannot create\n");
 		return;
 	}
-	SockPad sock;
-	if(connector->Connect(sock) != LNERR_OK) {
+	SockPad skpad;
+	if(connector->Connect(skpad) != LNERR_OK) {
 		printf("connector cannot connect\n");
 		connector->Release();
 		return;
 	}
-	SockWaves *stream = SockWaves::NewInstance(sock);
+	SockWaves *stream = SockWaves::NewInstance(skpad);
 	const char *query = "GET / HTTP/1.1\r\n\r\n";
 	DataBlock *block = DataBlock::NewInstance(1024 * 1024);
 	strcpy(block->get_buffer(), query);

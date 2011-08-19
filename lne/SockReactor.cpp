@@ -42,9 +42,9 @@ SockReactor::SockReactor(LNE_UINT workers, LNE_UINT idle_timeout, LNE_UINT exit_
 	//create thread pool
 	if(IsAvailable()) {
 #if defined(LNE_WIN32)
-		threads_ = static_cast<HANDLE *>(malloc(sizeof(HANDLE) * workers + 1));
+		threads_ = static_cast<HANDLE *>(malloc(sizeof(HANDLE) * (workers + 1)));
 #else
-		threads_ = static_cast<pthread_t *>(malloc(sizeof(pthread_t) * workers + 1));
+		threads_ = static_cast<pthread_t *>(malloc(sizeof(pthread_t) * (workers + 1)));
 #endif
 		if(threads_ == NULL)
 			set_available(false);
@@ -85,10 +85,18 @@ SockReactor::~SockReactor(void)
 		pthread_join(threads_[i], NULL);
 #endif
 	}
-	if(poller_ != INVALID_POLLER)
-		closepoller(poller_);
 	if(threads_)
 		free(threads_);
+	if(eventer_circle_) {
+		SockEventer *p, *next = eventer_circle_;
+		do {
+			p = next;
+			next = next->get_next();
+			p ->HandleTerminate();
+		} while(next != eventer_circle_);
+	}
+	if(poller_ != INVALID_POLLER)
+		closepoller(poller_);
 }
 
 SockReactor *SockReactor::NewInstance(LNE_UINT workers, LNE_UINT idle_timeout, LNE_UINT exit_check_interval)
@@ -258,8 +266,8 @@ void SockReactor::Service(void)
 	SockEventer *client;
 	struct timespec timeout;
 	struct kevent event, kev;
-	timeout.tv_sec = 0;
-	timeout.tv_nsec = exit_check_interval_ * 1000 * 1000000;
+	timeout.tv_sec = exit_check_interval_;
+	timeout.tv_nsec = 0;
 	do {
 		rc = kevent(poller_, NULL, 0, &event, 1, &timeout);
 		if(rc > 0) {

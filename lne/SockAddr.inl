@@ -31,13 +31,13 @@ SockAddr::Set(const sockaddr_in6 &in6)
 LNE_INLINE
 SockAddr::operator bool()
 {
-	return family_ != AF_UNSPEC && size_ > 0;
+	return addr_.sa.sa_family != AF_UNSPEC && size_ > 0;
 }
 
 LNE_INLINE LNE_UINT
 SockAddr::get_family(void) const
 {
-	return family_;
+	return addr_.sa.sa_family;
 }
 
 LNE_INLINE LNE_UINT
@@ -45,14 +45,28 @@ SockAddr::get_size(void) const
 {
 	return size_;
 }
+
 LNE_INLINE const sockaddr *
 SockAddr::get_addr(void) const
 {
-	return (sockaddr *)&addr_;
+	return &addr_.sa;
 }
 
 LNE_INLINE const char *
 SockAddr::get_addr_text(void) const
 {
 	return addr_text_;
+}
+
+LNE_INLINE sockaddr *
+SockAddr::ready_raw_addr(void)
+{
+	return &addr_.sa;
+}
+
+LNE_INLINE socklen_t &
+SockAddr::ready_raw_size(void)
+{
+	size_ = sizeof(addr_);
+	return size_;
 }

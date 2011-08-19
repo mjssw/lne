@@ -20,6 +20,7 @@
 #define LNE_SOCKSTREAM_H
 
 #include "BaseObject.h"
+#include "SockPad.h"
 #include "SockAddr.h"
 
 LNE_NAMESPACE_BEGIN
@@ -31,10 +32,7 @@ public:
 	LNE_UINT GetPeerAddr(SockAddr &addr);
 
 protected:
-	SockStream(void);
-	~SockStream(void);
-
-	SOCKET socket_;
+	SockPad skpad_;
 };
 
 #include "SockStream.inl"

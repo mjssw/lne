@@ -68,17 +68,17 @@ bool SockSpray::HandleBind(SockPoller *poller)
 	bool result = false;
 #if defined(LNE_WIN32)
 	unsigned long value = 1;
-	if(ioctlsocket(socket_, FIONBIO, &value) == 0) {
+	if(ioctlsocket(skpad_.get_socket(), FIONBIO, &value) == 0) {
 #else
-	int flags = fcntl(socket_, F_GETFL);
-	if(flags >= 0 && fcntl(socket_, F_SETFL, flags | O_NONBLOCK) == 0) {
+	int flags = fcntl(skpad_.get_socket(), F_GETFL);
+	if(flags >= 0 && fcntl(skpad_.get_socket(), F_SETFL, flags | O_NONBLOCK) == 0) {
 #endif
 		poller_ = poller;
 #if defined(LNE_WIN32)
-		if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(socket_), poller_->Handle(), static_cast<ULONG_PTR>(socket_), 0) != NULL) {
+		if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(skpad_.get_socket()), poller_->Handle(), static_cast<ULONG_PTR>(skpad_.get_socket()), 0) != NULL) {
 			iocp_lock_.Lock();
 			DWORD bytes, flags = 0;
-			int rc = WSARecv(socket_, &iocp_data_.buffer, 1, &bytes, &flags, &iocp_data_.overlap[IOCP_READ], NULL);
+			int rc = WSARecv(skpad_.get_socket(), &iocp_data_.buffer, 1, &bytes, &flags, &iocp_data_.overlap[IOCP_READ], NULL);
 			if(rc != SOCKET_ERROR || WSAGetLastError() == ERROR_IO_PENDING) {
 				++iocp_data_.count;
 				result = true;
@@ -86,16 +86,16 @@ bool SockSpray::HandleBind(SockPoller *poller)
 			iocp_lock_.Unlock();
 		}
 #elif defined(LNE_LINUX)
-		if(epoll_ctl(poller_->Handle(), EPOLL_CTL_ADD, socket_, &epoll_data_) == 0)
+		if(epoll_ctl(poller_->Handle(), EPOLL_CTL_ADD, skpad_.get_socket(), &epoll_data_) == 0)
 			result = true;
 #elif defined(LNE_FREEBSD)
 		struct kevent kev[2];
-		EV_SET(&kev[0], socket_, EVFILT_READ, EV_ADD | EV_DISABLE | EV_CLEAR, 0, 0, static_cast<SockEventer *>(this));
-		EV_SET(&kev[1], socket_, EVFILT_WRITE, EV_ADD | EV_DISABLE | EV_CLEAR, 0, 0, static_cast<SockEventer *>(this));
+		EV_SET(&kev[0], skpad_.get_socket(), EVFILT_READ, EV_ADD | EV_DISABLE | EV_CLEAR, 0, 0, static_cast<SockEventer *>(this));
+		EV_SET(&kev[1], skpad_.get_socket(), EVFILT_WRITE, EV_ADD | EV_DISABLE | EV_CLEAR, 0, 0, static_cast<SockEventer *>(this));
 		if(kevent(poller_->Handle(), kev, 2, NULL, 0, NULL) == 0) {
 			kevent_data_.num_eof = 1;
-			EV_SET(&kev[0], socket_, EVFILT_READ, EV_ENABLE, 0, 0, static_cast<SockEventer *>(this));
-			EV_SET(&kev[1], socket_, EVFILT_WRITE, EV_ENABLE, 0, 0, static_cast<SockEventer *>(this));
+			EV_SET(&kev[0], skpad_.get_socket(), EVFILT_READ, EV_ENABLE, 0, 0, static_cast<SockEventer *>(this));
+			EV_SET(&kev[1], skpad_.get_socket(), EVFILT_WRITE, EV_ENABLE, 0, 0, static_cast<SockEventer *>(this));
 			kevent(poller_->Handle(), kev, 2, NULL, 0, NULL);
 			result = true;
 		}
@@ -125,10 +125,8 @@ void SockSpray::HandleIdleTimeout(void)
 
 void SockSpray::Clean(void)
 {
-	if(socket_ != INVALID_SOCKET) {
-		closesocket(socket_);
-		socket_ = INVALID_SOCKET;
-	}
+	if(skpad_)
+		skpad_.Close();
 	if(send_state_.cache_buf)
 		send_state_.cache_buf->Release();
 	while(send_blocks_.Extract(send_state_.cache_buf) == LNERR_OK)
@@ -244,15 +242,15 @@ void SockSpray::__Shutdown(void)
 		kevent_lock_.Unlock();
 #endif
 #if defined(LNE_WIN32)
-		shutdown(socket_, SD_BOTH);
+		shutdown(skpad_.get_socket(), SD_BOTH);
 #else
-		shutdown(socket_, SHUT_RDWR);
+		shutdown(skpad_.get_socket(), SHUT_RDWR);
 #endif
 	}
 #if defined(LNE_WIN32)
 	iocp_lock_.Lock();
 	if(iocp_data_.count == 0) {
-		if(PostQueuedCompletionStatus(poller_->Handle(), 0, static_cast<ULONG_PTR>(socket_), &iocp_data_.overlap[IOCP_SHUTDOWN]))
+		if(PostQueuedCompletionStatus(poller_->Handle(), 0, static_cast<ULONG_PTR>(skpad_.get_socket()), &iocp_data_.overlap[IOCP_SHUTDOWN]))
 			--iocp_data_.count;
 	}
 	iocp_lock_.Unlock();
@@ -315,10 +313,10 @@ send_data_next:
 		// send cache buffer
 		if(send_state_.cache_buf) {
 #if defined(LNE_WIN32)
-			len = send(socket_, send_state_.cache_buf->get_buffer() + send_state_.cache_len, send_state_.cache_buf->get_size() - send_state_.cache_len, 0);
+			len = send(skpad_.get_socket(), send_state_.cache_buf->get_buffer() + send_state_.cache_len, send_state_.cache_buf->get_size() - send_state_.cache_len, 0);
 #else
 			do {
-				len = send(socket_, send_state_.cache_buf->get_buffer() + send_state_.cache_len, send_state_.cache_buf->get_size() - send_state_.cache_len, MSG_NOSIGNAL);
+				len = send(skpad_.get_socket(), send_state_.cache_buf->get_buffer() + send_state_.cache_len, send_state_.cache_buf->get_size() - send_state_.cache_len, MSG_NOSIGNAL);
 			} while(len < 0 && errno == EINTR);
 #endif
 			if(len > 0) {
@@ -339,7 +337,7 @@ send_data_next:
 				else {
 					DWORD bytes;
 					iocp_lock_.Lock();
-					int rc = WSASend(socket_, &iocp_data_.buffer, 1, &bytes, 0, &iocp_data_.overlap[IOCP_WRITE], NULL);
+					int rc = WSASend(skpad_.get_socket(), &iocp_data_.buffer, 1, &bytes, 0, &iocp_data_.overlap[IOCP_WRITE], NULL);
 					if(rc == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 						to_shutdown = true;
 					else
@@ -415,7 +413,7 @@ recv_data_next:
 			to_shutdown = true;
 		else {
 			do {
-				len = recv(socket_, block->get_buffer_free(), block->get_free_size(), 0);
+				len = recv(skpad_.get_socket(), block->get_buffer_free(), block->get_free_size(), 0);
 				if(len > 0)
 					block->set_size(block->get_size() + len);
 #if defined(LNE_WIN32)
@@ -449,7 +447,7 @@ recv_data_next:
 			if(!continue_recv && !to_shutdown) {
 				DWORD bytes, flags = 0;
 				iocp_lock_.Lock();
-				int rc = WSARecv(socket_, &iocp_data_.buffer, 1, &bytes, &flags, &iocp_data_.overlap[IOCP_READ], NULL);
+				int rc = WSARecv(skpad_.get_socket(), &iocp_data_.buffer, 1, &bytes, &flags, &iocp_data_.overlap[IOCP_READ], NULL);
 				if(rc == SOCKET_ERROR && WSAGetLastError() != ERROR_IO_PENDING)
 					to_shutdown = true;
 				else
@@ -526,7 +524,7 @@ void SockSpray::LeaveThreadSafe(void)
 	}
 }
 
-SockSprayFactory::~SockSprayFactory()
+SockSprayFactory::~SockSprayFactory(void)
 {
 	pool_->Release();
 }
@@ -545,7 +543,7 @@ SockSprayFactory *SockSprayFactory::NewInstance(DataBlockPool *pool, LNE_UINT li
 	return result;
 }
 
-SockSpray *SockSprayFactory::Alloc(SockPad sock, SockSprayHandler *handler, void *context)
+SockSpray *SockSprayFactory::Alloc(SockPad skpad, SockSprayHandler *handler, void *context)
 {
 	SockSpray *result = dynamic_cast<SockSpray *>(PopObject());
 	if(result == NULL) {
@@ -556,9 +554,16 @@ SockSpray *SockSprayFactory::Alloc(SockPad sock, SockSprayHandler *handler, void
 		}
 	}
 	if(result) {
-		result->socket_ = sock.Detach();
+		result->skpad_ = skpad;
 		result->handler_ = handler;
 		result->context_ = context;
+		AddRef();
 	}
 	return result;
+}
+
+void SockSprayFactory::PushObject(SockPoolable *object)
+{
+	SockFactory::PushObject(object);
+	Release();
 }

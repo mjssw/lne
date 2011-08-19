@@ -20,6 +20,10 @@
 
 LNE_NAMESPACE_USING
 
+SockPoolable::~SockPoolable(void)
+{
+}
+
 void SockPoolable::ObjectDestroy(void)
 {
 	Clean();

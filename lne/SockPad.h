@@ -28,16 +28,17 @@ class SockPad
 public:
 	SockPad(void);
 	~SockPad(void);
-	SockPad(SockPad& other);
-	SockPad& operator = (SockPad& other);
-	SockPad& operator = (SOCKET sock);
+	SockPad(SockPad &other);
+	SockPad &operator = (SockPad &other);
 
 	operator bool(void);
-	operator SOCKET(void);
-	void Attach(SOCKET sock);
-	SOCKET Detach();
+	int get_family();
+	SOCKET get_socket();
+	void Attach(int family, SOCKET sock);
+	void Close();
 
 private:
+	int family_;
 	SOCKET socket_;
 };
 

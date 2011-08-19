@@ -19,19 +19,20 @@
 LNE_INLINE
 SockPad::SockPad(void)
 {
+	family_ = AF_UNSPEC;
 	socket_ = INVALID_SOCKET;
 }
 
 LNE_INLINE
 SockPad::~SockPad(void)
 {
-	if(socket_ != INVALID_SOCKET)
-		closesocket(socket_);
+	Close();
 }
 
 LNE_INLINE
 SockPad::SockPad(SockPad &other)
 {
+	family_ = AF_UNSPEC;
 	socket_ = INVALID_SOCKET;
 	operator=(other);
 }
@@ -39,14 +40,9 @@ SockPad::SockPad(SockPad &other)
 LNE_INLINE SockPad &
 SockPad::operator = (SockPad &other)
 {
-	Attach(other.Detach());
-	return *this;
-}
-
-LNE_INLINE SockPad &
-SockPad::operator = (SOCKET sock)
-{
-	Attach(sock);
+	Attach(other.family_, other.socket_);
+	other.family_ = AF_UNSPEC;
+	other.socket_ = INVALID_SOCKET;
 	return *this;
 }
 
@@ -56,24 +52,33 @@ SockPad::operator bool(void)
 	return socket_ != INVALID_SOCKET;
 }
 
-LNE_INLINE
-SockPad::operator SOCKET(void)
+LNE_INLINE int
+SockPad::get_family()
+{
+	return family_;
+}
+
+LNE_INLINE SOCKET
+SockPad::get_socket()
 {
 	return socket_;
 }
 
 LNE_INLINE void
-SockPad::Attach(SOCKET sock)
+SockPad::Attach(int family, SOCKET sock)
 {
-	if(sock != socket_ && socket_ != INVALID_SOCKET)
+	if(socket_ != INVALID_SOCKET)
 		closesocket(socket_);
+	family_ = family;
 	socket_ = sock;
 }
 
-LNE_INLINE SOCKET
-SockPad::Detach(void)
+LNE_INLINE void
+SockPad::Close()
 {
-	SOCKET sock = socket_;
-	socket_ = INVALID_SOCKET;
-	return sock;
+	family_ = AF_UNSPEC;
+	if(socket_ != INVALID_SOCKET) {
+		closesocket(socket_);
+		socket_ = INVALID_SOCKET;
+	}
 }

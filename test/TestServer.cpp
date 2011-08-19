@@ -2,10 +2,10 @@
 
 LNE_NAMESPACE_USING
 
-class MyHandler: public SockSprayHandler
+class SprayHandler: public SockSprayHandler
 {
 public:
-	MyHandler() {
+	SprayHandler() {
 		count_ = 0;
 		first_ = false;
 	}
@@ -38,33 +38,54 @@ private:
 	LNE_UINT count_;
 };
 
+class SpringHandler: public SockSpringHandler
+{
+public:
+	SpringHandler(SockSprayFactory *factory, SockReactor *poller) {
+		count_ = 0;
+		poller_ = poller;
+		factory_ = factory;
+		factory_->AddRef();
+	}
+	~SpringHandler() {
+		factory_->Release();
+	}
+	void HandleClient(SockSpring *spring, SockPad client) {
+		SockSpray *spray = factory_->Alloc(client, new SprayHandler(), reinterpret_cast<void *>(++count_));
+		if(spray)
+			poller_->Bind(spray);
+	}
+	void HandleShutdown(SockSpring *spring) {
+		delete this;
+	}
+private:
+	LNE_UINT count_;
+	SockReactor *poller_;
+	SockSprayFactory *factory_;
+};
+
+
 void TestServer()
 {
 	SockAddr addr(8080);
-	SockAcceptor *acceptor = SockAcceptor::NewInstance(addr);
-	if(acceptor == NULL) {
+	SockPad skpad;
+	if(SockAcceptor::NewInstance(skpad, addr) != LNERR_OK) {
 		printf("acceptor cannot create\n");
 		return;
 	}
 	SockReactor *poller = SockReactor::NewInstance(10, 10);
 	if(poller == NULL) {
 		printf("poller cannot create\n");
-		acceptor->Release();
 		return;
 	}
-	LNE_UINT count = 0;
-	SockPad sock;
-	SockSpray *spray;
-	DataBlockPool *pool = DataBlockPool::NewInstance();
-	SockSprayFactory *factory = SockSprayFactory::NewInstance(pool);
-	while(acceptor->Accept(sock) == LNERR_OK) {
-		spray = factory->Alloc(sock, new MyHandler(), reinterpret_cast<void *>(++count));
-		if(spray) {
-			poller->Bind(spray);
-		}
-	}
-	factory->Release();
+	DataBlockPool *pool =	DataBlockPool::NewInstance();
+	SockSprayFactory *ssfactory =	SockSprayFactory::NewInstance(pool);
 	pool->Release();
+	SockSpringFactory *factory = SockSpringFactory::NewInstance();
+	SockSpring *spring = factory->Alloc(skpad, new SpringHandler(ssfactory, poller), NULL);
+	ssfactory->Release();
+	factory->Release();
+	poller->Bind(spring);
+	Thread::Sleep(10000);
 	poller->Release();
-	acceptor->Release();
 }

@@ -40,26 +40,31 @@ public:
 	SockAddr &operator =(const SockAddr &other);
 	void Set(const sockaddr_in &in4);
 	void Set(const sockaddr_in6 &in6);
-	LNE_UINT Set(const sockaddr *addr, int len);
 	LNE_UINT Set(LNE_UINT16 port, int address_family = AF_UNSPEC);
 	LNE_UINT Set(const char *address, int address_family = AF_UNSPEC);
 	LNE_UINT Set(LNE_UINT16 port, const char *address, int address_family = AF_UNSPEC);
-	
+
 	LNE_UINT get_family(void) const;
 	LNE_UINT get_size(void) const;
 	const sockaddr *get_addr(void) const;
-	const char* get_addr_text(void) const;
+	const char *get_addr_text(void) const;
+
+	// WARNING: only used for LNE
+	sockaddr *ready_raw_addr(void);
+	socklen_t &ready_raw_size(void);
+	void generate_addr_text(void);
 
 private:
 	void Reset();
+	LNE_UINT Set(const sockaddr *addr, socklen_t len);
 
-	LNE_UINT family_;
-	LNE_UINT size_;
+	socklen_t size_;
 	union {
+		sockaddr     sa;
 		sockaddr_in  in4;
 		sockaddr_in6 in6;
 	} addr_;
-	char addr_text_[INET6_ADDRSTRLEN];
+	char addr_text_[INET6_ADDRSTRLEN + 1];
 };
 
 #include "SockAddr.inl"

@@ -30,6 +30,7 @@ class LNE_Export SockPoolable : public RefObject
 {
 public:
 	SockPoolable(SockFactory *factory);
+	~SockPoolable(void);
 
 protected:
 	void ObjectDestroy(void);
@@ -50,8 +51,8 @@ public:
 
 protected:
 	void ObjectDestroy(void);
-	void PushObject(SockPoolable* object);
-	SockPoolable* PopObject(void);
+	virtual void PushObject(SockPoolable* object);
+	virtual SockPoolable* PopObject(void);
 
 private:
 	ThreadLock lock_;

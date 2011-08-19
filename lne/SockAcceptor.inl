@@ -17,13 +17,13 @@
  */
 
 LNE_INLINE LNE_UINT
-SockAcceptor::Accept(SockPad& sock)
+SockAcceptor::Accept(SockPad& skpad)
 {
-	return Accept(sock, use_timeout_ ? &timeout_ : NULL);
+	return Accept(skpad, use_timeout_ ? &timeout_ : NULL);
 }
 
 LNE_INLINE LNE_UINT
-SockAcceptor::Accept(SockPad& sock, const TimeValue &tv)
+SockAcceptor::Accept(SockPad& skpad, const TimeValue &tv)
 {
-	return Accept(sock, &tv);
+	return Accept(skpad, &tv);
 }

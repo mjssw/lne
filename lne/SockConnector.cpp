@@ -49,11 +49,11 @@ void SockConnector::Release(void)
 	delete this;
 }
 
-LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeValue *tv)
+LNE_UINT SockConnector::Connect(SockPad &skpad, const SockAddr &addr, const TimeValue *tv)
 {
 	LNE_UINT result = LNERR_UNKNOW;
-	sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
-	if(sock) {
+	SOCKET sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
+	if(sock != INVALID_SOCKET) {
 		if(tv) {
 #if defined(LNE_WIN32)
 			unsigned long value = 1;
@@ -83,8 +83,8 @@ LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeV
 			if(connect(sock, addr.get_addr(), addr.get_size()) == 0)
 				result = LNERR_OK;
 		}
-		if(result != LNERR_OK)
-			sock = INVALID_SOCKET;
+		if(result == LNERR_OK)
+			skpad.Attach(addr.get_family(), sock);
 	}
 	return result;
 }

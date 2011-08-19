@@ -16,7 +16,6 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 LNE_INLINE SockSprayHandler *
 SockSpray::get_handler(void)
 {

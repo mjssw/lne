@@ -16,23 +16,21 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LNE_H
-#define LNE_H
+LNE_INLINE SockSpringHandler *
+SockSpring::get_handler(void)
+{
+	return handler_;
+}
 
-#include "TimeValue.h"
-#include "ThreadMutex.h"
-#include "ThreadSemaphore.h"
-#include "Thread.h"
-#include "ThreadPool.h"
-#include "DataBlock.h"
-#include "DataBlockPool.h"
-#include "SockAddr.h"
-#include "SockWaves.h"
-#include "SockAcceptor.h"
-#include "SockConnector.h"
-#include "SockSpring.h"
-#include "SockSpray.h"
-#include "SockReactor.h"
+LNE_INLINE void *
+SockSpring::get_context(void)
+{
+	return context_;
+}
 
-#endif
+LNE_INLINE
+SockSpringFactory::SockSpringFactory(LNE_UINT limit_factroy_cache)
+	: SockFactory(limit_factroy_cache)
+{
+}
 
