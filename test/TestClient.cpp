@@ -1,5 +1,8 @@
 #include "test.h"
 
+#include <lne/SockWaves.h>
+#include <lne/SockConnector.h>
+
 LNE_NAMESPACE_USING
 
 void TestClient()

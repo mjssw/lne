@@ -1,5 +1,9 @@
 #include "test.h"
 
+#include <lne/Thread.h>
+#include <lne/ThreadMutex.h>
+#include <lne/ThreadSemaphore.h>
+
 LNE_NAMESPACE_USING
 
 class MyRunner: public Runnable

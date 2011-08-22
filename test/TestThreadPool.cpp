@@ -1,5 +1,8 @@
 #include "test.h"
 
+#include <lne/Thread.h>
+#include <lne/ThreadPool.h>
+
 LNE_NAMESPACE_USING
 
 class MyTask: public ThreadTask

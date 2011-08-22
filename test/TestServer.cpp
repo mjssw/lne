@@ -1,5 +1,12 @@
 #include "test.h"
 
+#include <lne/Thread.h>
+#include <lne/DataBlockPool.h>
+#include <lne/SockAcceptor.h>
+#include <lne/SockSpray.h>
+#include <lne/SockSpring.h>
+#include <lne/SockReactor.h>
+
 LNE_NAMESPACE_USING
 
 class SprayHandler: public SockSprayHandler
