@@ -19,7 +19,6 @@
 #ifndef LNE_SOCKCONNECTOR_H
 #define LNE_SOCKCONNECTOR_H
 
-#include "BaseObject.h"
 #include "SockAddr.h"
 #include "TimeValue.h"
 #include "SockWaves.h"
@@ -31,11 +30,11 @@ class LNE_Export SockConnector
 public:
 	static SockConnector *NewInstance(const SockAddr &addr, const TimeValue *tv = NULL);
 	void Release(void);
-	
-	LNE_UINT Connect(SockPad& skpad);
-	static LNE_UINT Connect(SockPad& skpad, const SockAddr &addr);
-	static LNE_UINT Connect(SockPad& skpad, const SockAddr &addr, const TimeValue &tv);
-	static LNE_UINT Connect(SockPad& skpad, const SockAddr &addr, const TimeValue *tv);
+
+	LNE_UINT Connect(SockPad &skpad);
+	static LNE_UINT Connect(SockPad &skpad, const SockAddr &addr);
+	static LNE_UINT Connect(SockPad &skpad, const SockAddr &addr, const TimeValue &tv);
+	static LNE_UINT Connect(SockPad &skpad, const SockAddr &addr, const TimeValue *tv);
 
 private:
 	SockConnector(void);

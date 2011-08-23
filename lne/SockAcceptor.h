@@ -19,7 +19,6 @@
 #ifndef LNE_SOCKACCEPTOR_H
 #define LNE_SOCKACCEPTOR_H
 
-#include "BaseObject.h"
 #include "SockPad.h"
 #include "SockAddr.h"
 #include "TimeValue.h"

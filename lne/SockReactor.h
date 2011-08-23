@@ -19,8 +19,8 @@
 #ifndef LNE_SOCKREACTOR_H
 #define LNE_SOCKREACTOR_H
 
-#include "ExtendObject.h"
 #include "SockEventer.h"
+#include "ExtendObject.h"
 
 LNE_NAMESPACE_BEGIN
 

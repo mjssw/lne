@@ -51,8 +51,8 @@ public:
 
 protected:
 	void ObjectDestroy(void);
-	virtual void PushObject(SockPoolable* object);
-	virtual SockPoolable* PopObject(void);
+	virtual void PushObject(SockPoolable *object);
+	virtual SockPoolable *PopObject(void);
 
 private:
 	ThreadLock lock_;

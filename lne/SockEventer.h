@@ -55,7 +55,7 @@ public:
 	virtual bool HandleBind(SockPoller *poller) = 0;
 	virtual void HandleTerminate(void) = 0;
 
-	// only used for SockPoller's implementation
+	// WARNING: only used for LNE
 	SockEventer *get_prev(void);
 	void set_prev(SockEventer *prev);
 	SockEventer *get_next(void);
@@ -63,10 +63,15 @@ public:
 	time_t get_active(void);
 	void set_active(time_t active);
 
+protected:
+	SockPoller *get_poller(void);
+	void set_poller(SockPoller *poller);
+
 private:
 	SockEventer *prev_;
 	SockEventer *next_;
 	time_t active_;
+	SockPoller *poller_;
 };
 
 #include "SockEventer.inl"

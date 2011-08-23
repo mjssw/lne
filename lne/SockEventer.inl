@@ -51,3 +51,15 @@ SockEventer::set_active(time_t active)
 {
 	active_ = active;
 }
+
+LNE_INLINE SockPoller *
+SockEventer::get_poller(void)
+{
+	return poller_;
+}
+
+LNE_INLINE void
+SockEventer::set_poller(SockPoller *poller)
+{
+	poller_ = poller;
+}

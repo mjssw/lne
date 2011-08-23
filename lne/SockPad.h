@@ -19,7 +19,7 @@
 #ifndef LNE_SOCKPAD_H
 #define LNE_SOCKPAD_H
 
-#include "BaseObject.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 

@@ -24,7 +24,7 @@
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadMutex: public Available,public NonCopyable
+class LNE_Export ThreadMutex: public Available, public NonCopyable
 {
 public:
 	ThreadMutex(void);
@@ -32,7 +32,7 @@ public:
 
 	LNE_UINT TryAcquire(void);
 	LNE_UINT Acquire(void);
-	LNE_UINT Acquire(const TimeValue& tv);;
+	LNE_UINT Acquire(const TimeValue &tv);;
 	LNE_UINT Release(void);
 
 private:

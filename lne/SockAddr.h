@@ -19,7 +19,7 @@
 #ifndef LNE_SOCKADDR_H
 #define LNE_SOCKADDR_H
 
-#include "BaseObject.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 

@@ -43,16 +43,16 @@ public:
 	void Set(const struct timeval &tv);
 	void Set(const struct timespec &ts);
 
-	operator timeval*();
-	operator timeval&();
+	operator timeval *();
+	operator timeval &();
 	TimeValue &operator = (const TimeValue &tv);
 
 	LNE_UINT64 ToMillisecond(void) const;
 	LNE_UINT64 ToMicroseconds(void) const;
 	time_t get_sec(void) const;
 	suseconds_t get_usec(void) const;
-	operator const timeval*() const ;
-	operator const timeval&() const ;
+	operator const timeval *() const ;
+	operator const timeval &() const ;
 	TimeValue &operator += (const TimeValue &tv);
 	TimeValue &operator -= (const TimeValue &tv);
 

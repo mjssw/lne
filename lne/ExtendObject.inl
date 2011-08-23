@@ -16,7 +16,7 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-LNE_INLINE void 
+LNE_INLINE void
 RefObject::AddRef(void)
 {
 	lock_.Lock();
@@ -24,7 +24,7 @@ RefObject::AddRef(void)
 	lock_.Unlock();
 }
 
-LNE_INLINE void 
+LNE_INLINE void
 RefObject::SetRef(LNE_UINT ref)
 {
 	lock_.Lock();

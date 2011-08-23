@@ -45,8 +45,10 @@ class LNE_Export SockSpring: public SockEventer, public SockPoolable
 	}	IOCP_OVERLAPPED_ACCEPT;
 #endif
 public:
-	SockSpringHandler *get_handler(void);
 	void *get_context(void);
+
+	// WARNING: only used for LNE
+	SockSpringHandler *get_handler(void);
 
 protected:
 	bool IdleTimeout(void);

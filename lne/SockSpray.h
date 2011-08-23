@@ -47,8 +47,10 @@ public:
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
-	SockSprayHandler *get_handler(void);
 	void *get_context(void);
+
+	// WARNING: only used for LNE
+	SockSprayHandler *get_handler(void);
 
 protected:
 	bool IdleTimeout(void);
@@ -127,7 +129,7 @@ public:
 private:
 	SockSprayFactory(LNE_UINT limit_factroy_cache);
 	~SockSprayFactory(void);
-	void PushObject(SockPoolable* object);
+	void PushObject(SockPoolable *object);
 
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;

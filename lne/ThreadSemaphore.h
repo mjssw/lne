@@ -24,7 +24,7 @@
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadSemaphore: public Available,public NonCopyable
+class LNE_Export ThreadSemaphore: public Available, public NonCopyable
 {
 public:
 	ThreadSemaphore(LNE_UINT count = 1, LNE_UINT max = 0x7FFFFFFF);

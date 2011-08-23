@@ -46,7 +46,7 @@ ThreadLock::Lock(void)
 	if(spin_count_ > 0)
 		pthread_mutex_spinlock(&lock_, spin_count_);
 	else
-		pthread_mutex_lock(&lock_);	
+		pthread_mutex_lock(&lock_);
 #endif
 }
 
