@@ -27,26 +27,26 @@ SockPoolable::~SockPoolable(void)
 void SockPoolable::ObjectDestroy(void)
 {
 	Clean();
-	if(factory_) {
+	if(pool_) {
 		SetRef(1);
-		factory_->PushObject(this);
+		pool_->PushObject(this);
 	} else
 		delete this;
 }
 
-SockFactory::SockFactory(LNE_UINT limit_cache)
+SockBasePool::SockBasePool(LNE_UINT limit_cache)
 {
 	limit_cache_ = limit_cache;
 }
 
-SockFactory::~SockFactory(void)
+SockBasePool::~SockBasePool(void)
 {
 	SockPoolable *object;
 	while(objects_.Pop(object) == LNERR_OK)
 		delete object;
 }
 
-void SockFactory::PushObject(SockPoolable *object)
+void SockBasePool::PushObject(SockPoolable *object)
 {
 	lock_.Lock();
 	if(objects_.get_count() > limit_cache_ || objects_.Push(object) != LNERR_OK)
@@ -54,7 +54,7 @@ void SockFactory::PushObject(SockPoolable *object)
 	lock_.Unlock();
 }
 
-SockPoolable *SockFactory::PopObject(void)
+SockPoolable *SockBasePool::PopObject(void)
 {
 	SockPoolable *object;
 	lock_.Lock();
@@ -64,7 +64,7 @@ SockPoolable *SockFactory::PopObject(void)
 	return object;
 }
 
-void SockFactory::ObjectDestroy(void)
+void SockBasePool::ObjectDestroy(void)
 {
 	delete this;
 }

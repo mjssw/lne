@@ -24,12 +24,12 @@
 
 LNE_NAMESPACE_BEGIN
 
-class SockFactory;
+class SockBasePool;
 
 class LNE_Export SockPoolable : public RefObject
 {
 public:
-	SockPoolable(SockFactory *factory);
+	SockPoolable(SockBasePool *pool);
 	~SockPoolable(void);
 
 protected:
@@ -37,17 +37,17 @@ protected:
 	virtual void Clean(void) = 0;
 
 private:
-	SockFactory *factory_;
+	SockBasePool *pool_;
 };
 
-class LNE_Export SockFactory: public RefObject
+class LNE_Export SockBasePool: public RefObject
 {
 	friend class SockPoolable;
 public:
 	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
 
-	SockFactory(LNE_UINT limit_cache);
-	~SockFactory(void);
+	SockBasePool(LNE_UINT limit_cache);
+	~SockBasePool(void);
 
 protected:
 	void ObjectDestroy(void);

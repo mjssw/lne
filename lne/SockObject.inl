@@ -17,7 +17,7 @@
  */
 
 LNE_INLINE
-SockPoolable::SockPoolable(SockFactory *factory)
-	: factory_(factory)
+SockPoolable::SockPoolable(SockBasePool *pool)
+	: pool_(pool)
 {
 }

@@ -182,10 +182,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DataBlockPool.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ExtendObject.cpp"
 				>
 			</File>
@@ -281,10 +277,6 @@
 			</File>
 			<File
 				RelativePath=".\DataBlock.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DataBlockPool.h"
 				>
 			</File>
 			<File
@@ -391,10 +383,6 @@
 			</File>
 			<File
 				RelativePath=".\DataBlock.inl"
-				>
-			</File>
-			<File
-				RelativePath=".\DataBlockPool.inl"
 				>
 			</File>
 			<File

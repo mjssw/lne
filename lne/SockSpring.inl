@@ -29,8 +29,8 @@ SockSpring::get_context(void)
 }
 
 LNE_INLINE
-SockSpringFactory::SockSpringFactory(LNE_UINT limit_factroy_cache)
-	: SockFactory(limit_factroy_cache)
+SockSpringPool::SockSpringPool(LNE_UINT limit_cache)
+	: SockBasePool(limit_cache)
 {
 }
 

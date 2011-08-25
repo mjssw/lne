@@ -22,6 +22,7 @@ LNE_NAMESPACE_USING
 
 SockEventer::SockEventer(void)
 {
+	poller_ = NULL;
 	prev_ = next_ = NULL;
 }
 

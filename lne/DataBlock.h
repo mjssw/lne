@@ -57,6 +57,40 @@ private:
 	DataBlockPool *pool_;
 };
 
+class LNE_Export DataBlockPool: public RefObject
+{
+	friend class DataBlock;
+	struct BlockQueue {
+		BlockQueue *next;
+		DataBlock *block;
+	};
+	struct BlockCache {
+		BlockCache *next;
+		BlockQueue queue[0];
+	};
+public:
+	static const LNE_UINT DEFAULT_CACHE_BLOCKS = 128;
+
+	static DataBlockPool *NewInstance(LNE_UINT capacity = DataBlock::DEFAULT_CAPACITY, LNE_UINT cache_blocks = DEFAULT_CACHE_BLOCKS);
+
+	DataBlock *Alloc(void);
+	LNE_UINT get_capacity(void) const;
+
+private:
+	DataBlockPool(void);
+	~DataBlockPool(void);
+	void ObjectDestroy(void);
+	void Free(DataBlock *block);
+	void AppendCache(char *buffer);
+
+	LNE_UINT capacity_;
+	LNE_UINT cache_blocks_;
+	BlockCache *cache_head_;
+	BlockQueue *queue_head_;
+	BlockQueue *queue_free_;
+	ThreadLock queue_lock_;
+};
+
 #include "DataBlock.inl"
 
 LNE_NAMESPACE_END

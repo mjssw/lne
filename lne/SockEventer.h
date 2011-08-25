@@ -37,7 +37,7 @@ class LNE_Export SockEventer: public Abstract
 {
 public:
 #if defined(LNE_WIN32)
-	enum {IOCP_WRITE = 0, IOCP_READ = 1, IOCP_SHUTDOWN = 2};
+	enum {IOCP_WRITE = 0, IOCP_READ, IOCP_SHUTDOWN, IOCP_ARRAY_MAX};
 	typedef struct : public WSAOVERLAPPED {
 		WSAOVERLAPPED overlap;
 		DWORD type;
@@ -47,6 +47,7 @@ public:
 
 public:
 	SockEventer(void);
+	virtual void Shutdown(void) = 0;
 	virtual bool IdleTimeout(void) = 0;
 	virtual void HandleRead(void);
 	virtual void HandleWrite(void);
@@ -68,10 +69,10 @@ protected:
 	void set_poller(SockPoller *poller);
 
 private:
+	SockPoller *poller_;
 	SockEventer *prev_;
 	SockEventer *next_;
 	time_t active_;
-	SockPoller *poller_;
 };
 
 #include "SockEventer.inl"

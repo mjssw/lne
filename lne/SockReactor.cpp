@@ -204,12 +204,14 @@ void *SockReactor::ThreadService(void *parameter)
 
 void SockReactor::Timer(void)
 {
-	SockEventer *next;
+	LNE_UINT items;
 	time_t current;
-	TimeValue timeout(exit_check_interval_, 0);
+	SockEventer *next;
+	TimeValue timeout(DEFAULT_IDLE_CHECK_INTERVAL, 0);
 	do {
 		eventer_lock_.Lock();
 		if(eventer_circle_) {
+			items = 0;
 			next = eventer_circle_;
 			do {
 				if(next->IdleTimeout() && time(&current) - next->get_active() > idle_timeout_) {
@@ -217,7 +219,8 @@ void SockReactor::Timer(void)
 					next->HandleIdleTimeout();
 				}
 				next = next->get_next();
-			} while(next != eventer_circle_);
+			} while(next != eventer_circle_ && items++ < DEFAULT_IDLE_CHECK_ITEMS);
+			eventer_circle_ = next;
 		}
 		eventer_lock_.Unlock();
 		if(!exit_request_)

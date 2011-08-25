@@ -26,18 +26,18 @@
 LNE_NAMESPACE_BEGIN
 
 class SockSpring;
-class SockSpringFactory;
+class SockSpringPool;
 
 class LNE_Export SockSpringHandler: public Abstract
 {
 public:
 	virtual void HandleClient(SockSpring *spring, SockPad client) = 0;
-	virtual void HandleShutdown(SockSpring *spring) = 0;
+	virtual void HandleTerminate(SockSpring *spring) = 0;
 };
 
 class LNE_Export SockSpring: public SockEventer, public SockPoolable
 {
-	friend class SockSpringFactory;
+	friend class SockSpringPool;
 #if defined(LNE_WIN32)
 	typedef struct : public IOCP_OVERLAPPED {
 		SOCKET child;
@@ -45,6 +45,7 @@ class LNE_Export SockSpring: public SockEventer, public SockPoolable
 	}	IOCP_OVERLAPPED_ACCEPT;
 #endif
 public:
+	void Shutdown(void);
 	void *get_context(void);
 
 	// WARNING: only used for LNE
@@ -57,14 +58,18 @@ protected:
 	void HandleTerminate(void);
 
 private:
-	SockSpring(SockFactory *factory);
+	SockSpring(SockBasePool *pool);
 	~SockSpring(void);
 	void Clean(void);
+	void __Shutdown(void);
+	void __HandleRead(void);
 
+	// for shutdown
+	bool shutdown_already_;
+	ThreadLock shutdown_lock_;
 	SockSpringHandler *handler_;
 	void *context_;
 	SockPad skpad_;
-	SockPoller *poller_;
 #if defined(LNE_WIN32)
 	IOCP_OVERLAPPED_ACCEPT iocp_data_;
 #elif defined(LNE_LINUX)
@@ -72,16 +77,16 @@ private:
 #endif
 };
 
-class LNE_Export SockSpringFactory : public SockFactory
+class LNE_Export SockSpringPool : public SockBasePool
 {
 	friend class SockSpring;
 public:
-	static SockSpringFactory *NewInstance(LNE_UINT limit_factroy_cache = SockFactory::DEFAULT_LIMIT_CACHE);
+	static SockSpringPool *NewInstance(LNE_UINT limit_cache = SockBasePool::DEFAULT_LIMIT_CACHE);
 	SockSpring *Alloc(SockPad skpad, SockSpringHandler *handler, void *context);
 
 private:
-	SockSpringFactory(LNE_UINT limit_factroy_cache);
-	~SockSpringFactory(void);
+	SockSpringPool(LNE_UINT limit_cache);
+	~SockSpringPool(void);
 	void PushObject(SockPoolable *object);
 };
 

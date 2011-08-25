@@ -92,3 +92,8 @@ DataBlock::set_size(LNE_UINT size)
 	return LNERR_PARAMETER;
 }
 
+LNE_INLINE LNE_UINT
+DataBlockPool::get_capacity(void) const
+{
+	return capacity_;
+}

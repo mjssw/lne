@@ -31,18 +31,19 @@ LNE_NAMESPACE_BEGIN
 class DataBlockPool;
 class SockReactor;
 class SockSpray;
-class SockSprayFactory;
+class SockSprayPool;
 
 class LNE_Export SockSprayHandler: public Abstract
 {
 public:
 	virtual void HandleData(SockSpray *client, DataBlock *block) = 0;
 	virtual void HandleShutdown(SockSpray *client) = 0;
+	virtual void HandleTerminate(SockSpray *client) = 0;
 };
 
 class LNE_Export SockSpray: public SockEventer, public SockPoolable, public SockStream
 {
-	friend class SockSprayFactory;
+	friend class SockSprayPool;
 public:
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
@@ -62,7 +63,7 @@ protected:
 	void HandleIdleTimeout(void);
 
 private:
-	SockSpray(SockFactory *factory);
+	SockSpray(SockBasePool *pool);
 	~SockSpray(void);
 	void Clean(void);
 	void __Shutdown(void);
@@ -77,7 +78,7 @@ private:
 	LNE_UINT limit_write_cache_;
 	SockSprayHandler *handler_;
 	void *context_;
-	ThreadLock lock_;
+	ThreadLock thread_lock_;
 	LNE_UINT thread_count_;
 	// for send
 	struct {
@@ -101,12 +102,11 @@ private:
 		bool already;
 	} shutdown_state_;
 	ThreadLock shutdown_lock_;
-	SockPoller *poller_;
 #if defined(LNE_WIN32)
 	struct {
 		LNE_INT count;
 		WSABUF buffer;
-		IOCP_OVERLAPPED overlap[3];
+		IOCP_OVERLAPPED overlap[IOCP_ARRAY_MAX];
 	} iocp_data_;
 	ThreadLock iocp_lock_;
 #elif defined(LNE_LINUX)
@@ -119,19 +119,20 @@ private:
 #endif
 };
 
-class LNE_Export SockSprayFactory : public SockFactory
+class LNE_Export SockSprayPool : public SockBasePool
 {
 	friend class SockSpray;
+	static const LNE_UINT DEFAULT_WRITE_CACHE = 128;
 public:
-	static SockSprayFactory *NewInstance(DataBlockPool *pool, LNE_UINT limit_write_cache = 128, LNE_UINT limit_factroy_cache = SockFactory::DEFAULT_LIMIT_CACHE);
+	static SockSprayPool *NewInstance(DataBlockPool *data_pool, LNE_UINT limit_write_cache = DEFAULT_WRITE_CACHE, LNE_UINT limit_cache = SockBasePool::DEFAULT_LIMIT_CACHE);
 	SockSpray *Alloc(SockPad skpad, SockSprayHandler *handler, void *context);
 
 private:
-	SockSprayFactory(LNE_UINT limit_factroy_cache);
-	~SockSprayFactory(void);
+	SockSprayPool(LNE_UINT limit_cache);
+	~SockSprayPool(void);
 	void PushObject(SockPoolable *object);
 
-	DataBlockPool *pool_;
+	DataBlockPool *data_pool_;
 	LNE_UINT limit_write_cache_;
 };
 

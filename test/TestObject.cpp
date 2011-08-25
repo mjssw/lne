@@ -1,6 +1,6 @@
 #include "test.h"
 
-#include <lne/DataBlockPool.h>
+#include <lne/DataBlock.h>
 #include <lne/ObjectQueue_T.h>
 
 LNE_NAMESPACE_USING

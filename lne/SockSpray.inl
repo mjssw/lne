@@ -29,10 +29,10 @@ SockSpray::get_context(void)
 }
 
 LNE_INLINE
-SockSprayFactory::SockSprayFactory(LNE_UINT limit_factroy_cache)
-	: SockFactory(limit_factroy_cache)
+SockSprayPool::SockSprayPool(LNE_UINT limit_cache)
+	: SockBasePool(limit_cache)
 {
-	pool_ = NULL;
+	data_pool_ = NULL;
 	limit_write_cache_ = 0;
 }
 

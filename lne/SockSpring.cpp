@@ -20,9 +20,10 @@
 
 LNE_NAMESPACE_USING
 
-SockSpring::SockSpring(SockFactory *factory)
-	: SockPoolable(factory)
+SockSpring::SockSpring(SockBasePool *pool)
+	: SockPoolable(pool), shutdown_lock_(true)
 {
+	shutdown_already_ = false;
 #if defined(LNE_WIN32)
 	memset(&iocp_data_, 0, sizeof(iocp_data_));
 	iocp_data_.type = IOCP_READ;
@@ -49,6 +50,23 @@ void SockSpring::Clean(void)
 #endif
 	if(skpad_)
 		skpad_.Close();
+	set_poller(NULL);
+	shutdown_already_ = false;
+}
+
+void SockSpring::Shutdown(void)
+{
+	shutdown_lock_.Lock();
+	if(!shutdown_already_)
+		__Shutdown();
+	shutdown_lock_.Unlock();
+	get_poller()->UnBind(this);
+}
+
+void SockSpring::__Shutdown(void)
+{
+	skpad_.Close();
+	shutdown_already_ = true;
 }
 
 bool SockSpring::IdleTimeout(void)
@@ -66,21 +84,21 @@ bool SockSpring::HandleBind(SockPoller *poller)
 	int flags = fcntl(skpad_.get_socket(), F_GETFL);
 	if(flags >= 0 && fcntl(skpad_.get_socket(), F_SETFL, flags | O_NONBLOCK) == 0) {
 #endif
-		poller_ = poller;
+		set_poller(poller);
 #if defined(LNE_WIN32)
-		if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(skpad_.get_socket()), poller_->Handle(), static_cast<ULONG_PTR>(skpad_.get_socket()), 0) != NULL) {
+		if(CreateIoCompletionPort(reinterpret_cast<HANDLE>(skpad_.get_socket()), get_poller()->Handle(), static_cast<ULONG_PTR>(skpad_.get_socket()), 0) != NULL) {
 			DWORD bytes;
 			if(AcceptEx(skpad_.get_socket(), iocp_data_.child, iocp_data_.address, 0, 0, sizeof(iocp_data_.address), &bytes, &iocp_data_)
 					|| WSAGetLastError() == ERROR_IO_PENDING)
 				result = true;
 		}
 #elif defined(LNE_LINUX)
-		if(epoll_ctl(poller_->Handle(), EPOLL_CTL_ADD, skpad_.get_socket(), &epoll_data_) == 0)
+		if(epoll_ctl(get_poller()->Handle(), EPOLL_CTL_ADD, skpad_.get_socket(), &epoll_data_) == 0)
 			result = true;
 #elif defined(LNE_FREEBSD)
 		struct kevent kev[1];
 		EV_SET(&kev[0], skpad_.get_socket(), EVFILT_READ, EV_ADD, 0, 0, static_cast<SockEventer *>(this));
-		if(kevent(poller_->Handle(), kev, 1, NULL, 0, NULL) == 0)
+		if(kevent(get_poller()->Handle(), kev, 1, NULL, 0, NULL) == 0)
 			result = true;
 #endif
 	}
@@ -91,6 +109,20 @@ bool SockSpring::HandleBind(SockPoller *poller)
 
 void SockSpring::HandleRead(void)
 {
+	AddRef();
+	__HandleRead();
+	Release();
+}
+
+void SockSpring::__HandleRead(void)
+{
+	bool to_handle = true;
+	shutdown_lock_.Lock();
+	if(shutdown_already_)
+		to_handle = false;
+	shutdown_lock_.Unlock();
+	if(!to_handle)
+		return;
 	SockPad skpad;
 #if defined(LNE_WIN32)
 	SOCKET listen_socket = skpad_.get_socket();
@@ -109,7 +141,14 @@ void SockSpring::HandleRead(void)
 #else
 	SOCKET sock;
 	do {
-		sock = accept(skpad_.get_socket(), NULL, NULL);
+		shutdown_lock_.Lock();
+		if(skpad_)
+			sock = accept(skpad_.get_socket(), NULL, NULL);
+		else {
+			sock = SOCKET_ERROR;
+			errno = EBADF;
+		}
+		shutdown_lock_.Unlock();
 		if(sock != SOCKET_ERROR) {
 			skpad.Attach(skpad_.get_family(), sock);
 			handler_->HandleClient(this, skpad);
@@ -120,26 +159,27 @@ void SockSpring::HandleRead(void)
 
 void SockSpring::HandleTerminate(void)
 {
-	handler_->HandleShutdown(this);
+	__Shutdown();
+	handler_->HandleTerminate(this);
 	Release();
 }
 
-SockSpringFactory::~SockSpringFactory(void)
+SockSpringPool::~SockSpringPool(void)
 {
 }
 
-SockSpringFactory *SockSpringFactory::NewInstance(LNE_UINT limit_factroy_cache)
+SockSpringPool *SockSpringPool::NewInstance(LNE_UINT limit_cache)
 {
-	LNE_ASSERT_RETURN(limit_factroy_cache > 0, NULL);
-	SockSpringFactory *result = NULL;
+	LNE_ASSERT_RETURN(limit_cache > 0, NULL);
+	SockSpringPool *result = NULL;
 	try {
-		result = new SockSpringFactory(limit_factroy_cache);
+		result = new SockSpringPool(limit_cache);
 	} catch(std::bad_alloc) {
 	}
 	return result;
 }
 
-SockSpring *SockSpringFactory::Alloc(SockPad skpad, SockSpringHandler *handler, void *context)
+SockSpring *SockSpringPool::Alloc(SockPad skpad, SockSpringHandler *handler, void *context)
 {
 	SockSpring *result = dynamic_cast<SockSpring *>(PopObject());
 	if(result == NULL) {
@@ -158,8 +198,8 @@ SockSpring *SockSpringFactory::Alloc(SockPad skpad, SockSpringHandler *handler, 
 	return result;
 }
 
-void SockSpringFactory::PushObject(SockPoolable *object)
+void SockSpringPool::PushObject(SockPoolable *object)
 {
-	SockFactory::PushObject(object);
+	SockBasePool::PushObject(object);
 	Release();
 }
