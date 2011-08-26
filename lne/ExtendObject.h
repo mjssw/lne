@@ -40,7 +40,21 @@ private:
 	LNE_UINT reference_;
 };
 
-#include "ExtendObject.inl"
+LNE_INLINE void
+RefObject::AddRef(void)
+{
+	lock_.Lock();
+	++reference_;
+	lock_.Unlock();
+}
+
+LNE_INLINE void
+RefObject::SetRef(LNE_UINT ref)
+{
+	lock_.Lock();
+	reference_ = ref;
+	lock_.Unlock();
+}
 
 LNE_NAMESPACE_END
 

@@ -26,8 +26,6 @@ endif
 
 all: $(TARGET)
 
-%.o: %.cpp %.inl %.h
-	$(CC) $(CFLAGS) -c $< -o $@
 %.o: %.cpp %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 %.o: %.cpp
@@ -45,7 +43,7 @@ install: all
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/lne
 	cp -p $(TARGET) $(PREFIX)/lib
-	cp -p *.h *.inl $(PREFIX)/include/lne
+	cp -p *.h $(PREFIX)/include/lne
 	$(LN) $(PREFIX)/lib/$(TARGET) $(PREFIX)/lib/$(SONAME)
 	$(LN) $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/$(LNNAME)
 

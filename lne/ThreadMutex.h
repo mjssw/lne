@@ -43,7 +43,41 @@ private:
 #endif
 };
 
-#include "ThreadMutex.inl"
+LNE_INLINE LNE_UINT
+ThreadMutex::TryAcquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(mutex_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
+#else
+	return pthread_mutex_trylock(&mutex_) == 0 ? LNERR_OK : LNERR_TIMEOUT;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadMutex::Acquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(mutex_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return pthread_mutex_lock(&mutex_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadMutex::Release(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return ReleaseMutex(mutex_) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return pthread_mutex_unlock(&mutex_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
 
 LNE_NAMESPACE_END
 

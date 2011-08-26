@@ -43,7 +43,41 @@ private:
 #endif
 };
 
-#include "ThreadSemaphore.inl"
+LNE_INLINE LNE_UINT
+ThreadSemaphore::TryAcquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(sem_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
+#else
+	return sem_trywait(&sem_) == 0 ? LNERR_OK : LNERR_TIMEOUT;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadSemaphore::Acquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(sem_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return sem_wait(&sem_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadSemaphore::Release(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return ReleaseSemaphore(sem_, 1, NULL) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return sem_post(&sem_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
 
 LNE_NAMESPACE_END
 

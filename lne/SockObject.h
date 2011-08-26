@@ -60,7 +60,11 @@ private:
 	ObjectStack<SockPoolable *>  objects_;
 };
 
-#include "SockObject.inl"
+LNE_INLINE
+SockPoolable::SockPoolable(SockBasePool *pool)
+	: pool_(pool)
+{
+}
 
 LNE_NAMESPACE_END
 

@@ -41,7 +41,39 @@ private:
 	ObjectList<T, cache_nodes_> list_;
 };
 
-#include "ObjectStack_T.inl"
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+ObjectStack<T, cache_nodes_>::ObjectStack(void)
+{
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+ObjectStack<T, cache_nodes_>::~ObjectStack(void)
+{
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectStack<T, cache_nodes_>::Pop(T &object)
+{
+	return list_.PopBack(object);
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectStack<T, cache_nodes_>::Push(const T &object)
+{
+	return list_.PushBack(object);
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+bool ObjectStack<T, cache_nodes_>::IsEmpty(void) const
+{
+	return get_count() == 0;
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectStack<T, cache_nodes_>::get_count(void) const
+{
+	return list_.get_count();
+}
 
 LNE_NAMESPACE_END
 

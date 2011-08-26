@@ -45,7 +45,17 @@ private:
 	TimeValue timeout_;
 };
 
-#include "SockAcceptor.inl"
+LNE_INLINE LNE_UINT
+SockAcceptor::Accept(SockPad &skpad)
+{
+	return Accept(skpad, use_timeout_ ? &timeout_ : NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockAcceptor::Accept(SockPad &skpad, const TimeValue &tv)
+{
+	return Accept(skpad, &tv);
+}
 
 LNE_NAMESPACE_END
 

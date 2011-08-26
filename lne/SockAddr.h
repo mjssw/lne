@@ -67,7 +67,60 @@ private:
 	char addr_text_[INET6_ADDRSTRLEN + 1];
 };
 
-#include "SockAddr.inl"
+LNE_INLINE void
+SockAddr::Set(const sockaddr_in &in4)
+{
+	Set(reinterpret_cast<const sockaddr *>(&in4), sizeof(in4));
+}
+
+LNE_INLINE void
+SockAddr::Set(const sockaddr_in6 &in6)
+{
+	Set(reinterpret_cast<const sockaddr *>(&in6), sizeof(in6));
+}
+
+LNE_INLINE
+SockAddr::operator bool()
+{
+	return addr_.sa.sa_family != AF_UNSPEC && size_ > 0;
+}
+
+LNE_INLINE LNE_UINT
+SockAddr::get_family(void) const
+{
+	return addr_.sa.sa_family;
+}
+
+LNE_INLINE LNE_UINT
+SockAddr::get_size(void) const
+{
+	return size_;
+}
+
+LNE_INLINE const sockaddr *
+SockAddr::get_addr(void) const
+{
+	return &addr_.sa;
+}
+
+LNE_INLINE const char *
+SockAddr::get_addr_text(void) const
+{
+	return addr_text_;
+}
+
+LNE_INLINE sockaddr *
+SockAddr::ready_raw_addr(void)
+{
+	return &addr_.sa;
+}
+
+LNE_INLINE socklen_t &
+SockAddr::ready_raw_size(void)
+{
+	size_ = sizeof(addr_);
+	return size_;
+}
 
 LNE_NAMESPACE_END
 

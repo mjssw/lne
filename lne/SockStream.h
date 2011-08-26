@@ -35,8 +35,6 @@ protected:
 	SockPad skpad_;
 };
 
-#include "SockStream.inl"
-
 LNE_NAMESPACE_END
 
 #endif

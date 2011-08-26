@@ -42,7 +42,72 @@ private:
 	SOCKET socket_;
 };
 
-#include "SockPad.inl"
+LNE_INLINE
+SockPad::SockPad(void)
+{
+	family_ = AF_UNSPEC;
+	socket_ = INVALID_SOCKET;
+}
+
+LNE_INLINE
+SockPad::~SockPad(void)
+{
+	Close();
+}
+
+LNE_INLINE
+SockPad::SockPad(SockPad &other)
+{
+	family_ = AF_UNSPEC;
+	socket_ = INVALID_SOCKET;
+	operator=(other);
+}
+
+LNE_INLINE SockPad &
+SockPad::operator = (SockPad &other)
+{
+	Attach(other.family_, other.socket_);
+	other.family_ = AF_UNSPEC;
+	other.socket_ = INVALID_SOCKET;
+	return *this;
+}
+
+LNE_INLINE
+SockPad::operator bool(void)
+{
+	return socket_ != INVALID_SOCKET;
+}
+
+LNE_INLINE int
+SockPad::get_family()
+{
+	return family_;
+}
+
+LNE_INLINE SOCKET
+SockPad::get_socket()
+{
+	return socket_;
+}
+
+LNE_INLINE void
+SockPad::Attach(int family, SOCKET sock)
+{
+	if(socket_ != INVALID_SOCKET)
+		closesocket(socket_);
+	family_ = family;
+	socket_ = sock;
+}
+
+LNE_INLINE void
+SockPad::Close()
+{
+	family_ = AF_UNSPEC;
+	if(socket_ != INVALID_SOCKET) {
+		closesocket(socket_);
+		socket_ = INVALID_SOCKET;
+	}
+}
 
 LNE_NAMESPACE_END
 

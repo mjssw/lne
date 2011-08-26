@@ -44,7 +44,17 @@ private:
 	LNE_UINT Recv(DataBlock *block, const TimeValue *tv);
 };
 
-#include "SockWaves.inl"
+LNE_INLINE LNE_UINT
+SockWaves::Recv(DataBlock *block)
+{
+	return Recv(block, NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockWaves::Recv(DataBlock *block, const TimeValue &tv)
+{
+	return Recv(block, &tv);
+}
 
 LNE_NAMESPACE_END
 

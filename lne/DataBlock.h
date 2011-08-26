@@ -91,7 +91,87 @@ private:
 	ThreadLock queue_lock_;
 };
 
-#include "DataBlock.inl"
+LNE_INLINE bool
+DataBlock::IsFull(void) const
+{
+	return size_ == capacity_;
+}
+
+LNE_INLINE bool
+DataBlock::IsEmpty(void) const
+{
+	return size_ == 0;
+}
+
+LNE_INLINE char *
+DataBlock::get_buffer(void)
+{
+	return buffer_;
+}
+
+LNE_INLINE const char *
+DataBlock::get_buffer(void) const
+{
+	return buffer_;
+}
+
+LNE_INLINE char *
+DataBlock::get_buffer_free(void)
+{
+	return buffer_ + size_;
+}
+
+LNE_INLINE const char *
+DataBlock::get_buffer_free(void) const
+{
+	return buffer_ + size_;
+}
+
+LNE_INLINE char *
+DataBlock::get_buffer_end(void)
+{
+	return buffer_ + capacity_;
+}
+
+LNE_INLINE const char *
+DataBlock::get_buffer_end(void) const
+{
+	return buffer_ + capacity_;
+}
+
+LNE_INLINE LNE_UINT
+DataBlock::get_size(void) const
+{
+	return size_;
+}
+
+LNE_INLINE LNE_UINT
+DataBlock::get_capacity(void) const
+{
+	return capacity_;
+}
+
+LNE_INLINE LNE_UINT
+DataBlock::get_free_size(void) const
+{
+	return capacity_ - size_;
+}
+
+LNE_INLINE LNE_UINT
+DataBlock::set_size(LNE_UINT size)
+{
+	if(size <= capacity_) {
+		size_ = size;
+		return LNERR_OK;
+	}
+	return LNERR_PARAMETER;
+}
+
+LNE_INLINE LNE_UINT
+DataBlockPool::get_capacity(void) const
+{
+	return capacity_;
+}
 
 LNE_NAMESPACE_END
 

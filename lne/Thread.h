@@ -55,7 +55,25 @@ private:
 #endif
 };
 
-#include "Thread.inl"
+LNE_INLINE void
+Thread::Sleep(LNE_UINT64 msec)
+{
+#if defined(LNE_WIN32)
+	::Sleep((DWORD)msec);
+#else
+	::usleep(msec * 1000);
+#endif
+}
+
+LNE_INLINE void
+Thread::Sleep(const TimeValue &tv)
+{
+#if defined(LNE_WIN32)
+	::Sleep((DWORD)tv.ToMillisecond());
+#else
+	::usleep(tv.ToMicroseconds());
+#endif
+}
 
 LNE_NAMESPACE_END
 

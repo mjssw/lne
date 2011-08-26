@@ -70,8 +70,6 @@ private:
 #endif
 };
 
-#include "ThreadPool.inl"
-
 LNE_NAMESPACE_END
 
 #endif

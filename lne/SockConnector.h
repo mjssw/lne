@@ -45,7 +45,23 @@ private:
 	TimeValue timeout_;
 };
 
-#include "SockConnector.inl"
+LNE_INLINE LNE_UINT
+SockConnector::Connect(SockPad &skpad)
+{
+	return Connect(skpad, addr_, use_timeout_ ? &timeout_ : NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockConnector::Connect(SockPad &skpad, const SockAddr &addr)
+{
+	return Connect(skpad, addr, NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockConnector::Connect(SockPad &skpad, const SockAddr &addr, const TimeValue &tv)
+{
+	return Connect(skpad, addr, &tv);
+}
 
 LNE_NAMESPACE_END
 

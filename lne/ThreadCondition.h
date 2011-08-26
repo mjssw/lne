@@ -44,7 +44,47 @@ private:
 #endif
 };
 
-#include "ThreadCondition.inl"
+LNE_INLINE LNE_UINT
+ThreadCondition::Wait(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(event_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	int ret = LNERR_UNKNOW;
+	if(pthread_mutex_lock(&mutex_) == 0) {
+		if(signal_ || pthread_cond_wait(&cond_, &mutex_) == 0) {
+			signal_ = false;
+			ret = LNERR_OK;
+		}
+		pthread_mutex_unlock(&mutex_);
+	}
+	return ret;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadCondition::Signal(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return SetEvent(event_) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	int ret = LNERR_UNKNOW;
+	if(pthread_mutex_lock(&mutex_) == 0) {
+		if(signal_)
+			ret = LNERR_OK;
+		else if(pthread_cond_signal(&cond_) == 0) {
+			signal_ = true;
+			ret = LNERR_OK;
+		}
+		pthread_mutex_unlock(&mutex_);
+	}
+	return ret;
+#endif
+}
 
 LNE_NAMESPACE_END
 

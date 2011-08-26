@@ -136,7 +136,26 @@ private:
 	LNE_UINT limit_write_cache_;
 };
 
-#include "SockSpray.inl"
+LNE_INLINE SockSprayHandler *
+SockSpray::get_handler(void)
+{
+	return handler_;
+}
+
+LNE_INLINE void *
+SockSpray::get_context(void)
+{
+	return context_;
+}
+
+LNE_INLINE
+SockSprayPool::SockSprayPool(LNE_UINT limit_cache)
+	: SockBasePool(limit_cache)
+{
+	data_pool_ = NULL;
+	limit_write_cache_ = 0;
+}
+
 
 LNE_NAMESPACE_END
 

@@ -90,7 +90,24 @@ private:
 	void PushObject(SockPoolable *object);
 };
 
-#include "SockSpring.inl"
+LNE_INLINE SockSpringHandler *
+SockSpring::get_handler(void)
+{
+	return handler_;
+}
+
+LNE_INLINE void *
+SockSpring::get_context(void)
+{
+	return context_;
+}
+
+LNE_INLINE
+SockSpringPool::SockSpringPool(LNE_UINT limit_cache)
+	: SockBasePool(limit_cache)
+{
+}
+
 
 LNE_NAMESPACE_END
 

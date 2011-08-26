@@ -65,8 +65,6 @@ private:
 	LNE_UINT thread_workers_;
 };
 
-#include "SockReactor.inl"
-
 LNE_NAMESPACE_END
 
 #endif

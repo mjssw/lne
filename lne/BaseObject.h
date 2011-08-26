@@ -51,7 +51,23 @@ private:
 	bool available_;
 };
 
-#include "BaseObject.inl"
+LNE_INLINE
+Available::operator bool(void) const
+{
+	return available_;
+}
+
+LNE_INLINE bool
+Available::IsAvailable(void) const
+{
+	return available_;
+}
+
+LNE_INLINE void
+Available::set_available(bool available)
+{
+	available_ = available;
+}
 
 LNE_NAMESPACE_END
 

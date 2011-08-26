@@ -68,30 +68,6 @@
     <ClCompile Include="ThreadSemaphore.cpp" />
     <ClCompile Include="TimeValue.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="BaseObject.inl" />
-    <None Include="DataBlock.inl" />
-    <None Include="DataBlockPool.inl" />
-    <None Include="ExtendObject.inl" />
-    <None Include="ObjectList_T.inl" />
-    <None Include="ObjectQueue_T.inl" />
-    <None Include="ObjectStack_T.inl" />
-    <None Include="SockAcceptor.inl" />
-    <None Include="SockAddr.inl" />
-    <None Include="SockEventer.inl" />
-    <None Include="SockObject.inl" />
-    <None Include="SockStream.inl" />
-    <None Include="SockConnector.inl" />
-    <None Include="SockSpray.inl" />
-    <None Include="SockReactor.inl" />
-    <None Include="SockWaves.inl" />
-    <None Include="Thread.inl" />
-    <None Include="ThreadCondition.inl" />
-    <None Include="ThreadMutex.inl" />
-    <None Include="ThreadPool.inl" />
-    <None Include="ThreadSemaphore.inl" />
-    <None Include="TimeValue.inl" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7B86A70A-22B0-49D1-BF1E-EFBCFF026594}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
