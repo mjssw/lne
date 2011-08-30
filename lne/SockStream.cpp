@@ -22,7 +22,7 @@ LNE_NAMESPACE_USING
 
 LNE_UINT SockStream::GetSockAddr(SockAddr &addr)
 {
-	if(getsockname(skpad_.get_socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
+	if(getsockname(skpad_.socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
 		addr.generate_addr_text();
 		return LNERR_OK;
 	}
@@ -31,7 +31,7 @@ LNE_UINT SockStream::GetSockAddr(SockAddr &addr)
 
 LNE_UINT SockStream::GetPeerAddr(SockAddr &addr)
 {
-	if(getpeername(skpad_.get_socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
+	if(getpeername(skpad_.socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
 		addr.generate_addr_text();
 		return LNERR_OK;
 	}

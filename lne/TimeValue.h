@@ -49,8 +49,8 @@ public:
 
 	LNE_UINT64 ToMillisecond(void) const;
 	LNE_UINT64 ToMicroseconds(void) const;
-	time_t get_sec(void) const;
-	suseconds_t get_usec(void) const;
+	time_t sec(void) const;
+	suseconds_t usec(void) const;
 	operator const timeval *() const ;
 	operator const timeval &() const ;
 	TimeValue &operator += (const TimeValue &tv);
@@ -126,13 +126,13 @@ TimeValue::Set(const struct timespec &ts)
 }
 
 LNE_INLINE time_t
-TimeValue::get_sec(void) const
+TimeValue::sec(void) const
 {
 	return tv_.tv_sec;
 }
 
 LNE_INLINE suseconds_t
-TimeValue::get_usec(void) const
+TimeValue::usec(void) const
 {
 	return tv_.tv_usec;
 }
@@ -201,10 +201,10 @@ TimeValue::operator -= (const TimeValue &tv)
 LNE_INLINE bool
 operator > (const TimeValue &tv1, const TimeValue &tv2)
 {
-	if(tv1.get_sec() > tv2.get_sec())
+	if(tv1.sec() > tv2.sec())
 		return true;
-	else if(tv1.get_sec() == tv2.get_sec()
-			&& tv1.get_usec() > tv2.get_usec())
+	else if(tv1.sec() == tv2.sec()
+			&& tv1.usec() > tv2.usec())
 		return true;
 	else
 		return false;
@@ -213,10 +213,10 @@ operator > (const TimeValue &tv1, const TimeValue &tv2)
 LNE_INLINE bool
 operator >= (const TimeValue &tv1, const TimeValue &tv2)
 {
-	if(tv1.get_sec() > tv2.get_sec())
+	if(tv1.sec() > tv2.sec())
 		return true;
-	else if(tv1.get_sec() == tv2.get_sec()
-			&& tv1.get_usec() >= tv2.get_usec())
+	else if(tv1.sec() == tv2.sec()
+			&& tv1.usec() >= tv2.usec())
 		return true;
 	else
 		return false;
@@ -225,10 +225,10 @@ operator >= (const TimeValue &tv1, const TimeValue &tv2)
 LNE_INLINE bool
 operator < (const TimeValue &tv1, const TimeValue &tv2)
 {
-	if(tv1.get_sec() < tv2.get_sec())
+	if(tv1.sec() < tv2.sec())
 		return true;
-	else if(tv1.get_sec() == tv2.get_sec()
-			&& tv1.get_usec() < tv2.get_usec())
+	else if(tv1.sec() == tv2.sec()
+			&& tv1.usec() < tv2.usec())
 		return true;
 	else
 		return false;
@@ -237,10 +237,10 @@ operator < (const TimeValue &tv1, const TimeValue &tv2)
 LNE_INLINE bool
 operator <= (const TimeValue &tv1, const TimeValue &tv2)
 {
-	if(tv1.get_sec() < tv2.get_sec())
+	if(tv1.sec() < tv2.sec())
 		return true;
-	else if(tv1.get_sec() == tv2.get_sec()
-			&& tv1.get_usec() <= tv2.get_usec())
+	else if(tv1.sec() == tv2.sec()
+			&& tv1.usec() <= tv2.usec())
 		return true;
 	else
 		return false;
@@ -249,13 +249,13 @@ operator <= (const TimeValue &tv1, const TimeValue &tv2)
 LNE_INLINE bool
 operator == (const TimeValue &tv1, const TimeValue &tv2)
 {
-	return tv1.get_sec() == tv2.get_sec() && tv1.get_usec() == tv2.get_usec();
+	return tv1.sec() == tv2.sec() && tv1.usec() == tv2.usec();
 }
 
 LNE_INLINE bool
 operator != (const TimeValue &tv1, const TimeValue &tv2)
 {
-	return tv1.get_sec() != tv2.get_sec() || tv1.get_usec() != tv2.get_usec();
+	return tv1.sec() != tv2.sec() || tv1.usec() != tv2.usec();
 }
 
 LNE_NAMESPACE_END

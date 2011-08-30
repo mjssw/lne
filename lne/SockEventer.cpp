@@ -20,10 +20,25 @@
 
 LNE_NAMESPACE_USING
 
-SockEventer::SockEventer(void)
+SockEventer::SockEventer(SockEventerPool *pool)
 {
+	pool_ = pool;
 	poller_ = NULL;
 	prev_ = next_ = NULL;
+}
+
+void SockEventer::ObjectDestroy(void)
+{
+	Clean();
+	if(pool_) {
+		SetRef(1);
+		set_poller(NULL);
+		set_prev(NULL);
+		set_next(NULL);
+		set_context(NULL);
+		pool_->PushObject(this);
+	} else
+		delete this;
 }
 
 void SockEventer::HandleRead(void)
@@ -40,4 +55,42 @@ void SockEventer::HandleShutdown(void)
 
 void SockEventer::HandleIdleTimeout(void)
 {
+}
+
+SockEventerPool::SockEventerPool(LNE_UINT limit_cache)
+{
+	limit_cache_ = limit_cache;
+}
+
+SockEventerPool::~SockEventerPool(void)
+{
+	SockEventer *object;
+	while(objects_.Pop(object) == LNERR_OK)
+		delete object;
+}
+
+void SockEventerPool::PushObject(SockEventer *object)
+{
+	Lock();
+	if(objects_.count() > limit_cache_ || objects_.Push(object) != LNERR_OK)
+		delete object;
+	Unlock();
+	Release();
+}
+
+SockEventer *SockEventerPool::PopObject(void)
+{
+	SockEventer *object;
+	Lock();
+	if(objects_.Pop(object) != LNERR_OK)
+		object = NULL;
+	Unlock();
+	if(object)
+		AddRef();
+	return object;
+}
+
+void SockEventerPool::ObjectDestroy(void)
+{
+	delete this;
 }

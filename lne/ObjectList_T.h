@@ -46,7 +46,7 @@ public:
 	LNE_UINT PushBack(const T &object);
 
 	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+	LNE_UINT count(void) const;
 
 private:
 	ObjectList(const ObjectList &);
@@ -188,11 +188,11 @@ void ObjectList<T, cache_nodes_>::ExtendMemory()
 template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
 bool ObjectList<T, cache_nodes_>::IsEmpty(void) const
 {
-	return get_count() == 0;
+	return count() == 0;
 }
 
 template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
-LNE_UINT ObjectList<T, cache_nodes_>::get_count(void) const
+LNE_UINT ObjectList<T, cache_nodes_>::count(void) const
 {
 	return nodes_count_;
 }

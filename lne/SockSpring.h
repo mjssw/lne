@@ -21,7 +21,6 @@
 
 #include "SockPad.h"
 #include "SockEventer.h"
-#include "SockObject.h"
 
 LNE_NAMESPACE_BEGIN
 
@@ -35,7 +34,7 @@ public:
 	virtual void HandleTerminate(SockSpring *spring) = 0;
 };
 
-class LNE_Export SockSpring: public SockEventer, public SockPoolable
+class LNE_Export SockSpring: public SockEventer
 {
 	friend class SockSpringPool;
 #if defined(LNE_WIN32)
@@ -46,29 +45,25 @@ class LNE_Export SockSpring: public SockEventer, public SockPoolable
 #endif
 public:
 	void Shutdown(void);
-	void *get_context(void);
 
 	// WARNING: only used for LNE
-	SockSpringHandler *get_handler(void);
+	SockSpringHandler *handler(void);
 
 protected:
 	bool IdleTimeout(void);
 	void HandleRead(void);
-	bool HandleBind(SockPoller *poller);
+	bool HandleBind(SockPoller *binder);
 	void HandleTerminate(void);
 
 private:
-	SockSpring(SockBasePool *pool);
+	SockSpring(SockEventerPool *pool);
 	~SockSpring(void);
 	void Clean(void);
 	void __Shutdown(void);
 	void __HandleRead(void);
 
-	// for shutdown
 	bool shutdown_already_;
-	ThreadLock shutdown_lock_;
 	SockSpringHandler *handler_;
-	void *context_;
 	SockPad skpad_;
 #if defined(LNE_WIN32)
 	IOCP_OVERLAPPED_ACCEPT iocp_data_;
@@ -77,34 +72,27 @@ private:
 #endif
 };
 
-class LNE_Export SockSpringPool : public SockBasePool
+class LNE_Export SockSpringPool : public SockEventerPool
 {
 	friend class SockSpring;
 public:
-	static SockSpringPool *NewInstance(LNE_UINT limit_cache = SockBasePool::DEFAULT_LIMIT_CACHE);
-	SockSpring *Alloc(SockPad skpad, SockSpringHandler *handler, void *context);
+	static SockSpringPool *NewInstance(LNE_UINT limit_cache = SockEventerPool::DEFAULT_LIMIT_CACHE);
+	SockSpring *Alloc(SockPad skpad, SockSpringHandler *handler);
 
 private:
 	SockSpringPool(LNE_UINT limit_cache);
 	~SockSpringPool(void);
-	void PushObject(SockPoolable *object);
 };
 
 LNE_INLINE SockSpringHandler *
-SockSpring::get_handler(void)
+SockSpring::handler(void)
 {
 	return handler_;
 }
 
-LNE_INLINE void *
-SockSpring::get_context(void)
-{
-	return context_;
-}
-
 LNE_INLINE
 SockSpringPool::SockSpringPool(LNE_UINT limit_cache)
-	: SockBasePool(limit_cache)
+	: SockEventerPool(limit_cache)
 {
 }
 

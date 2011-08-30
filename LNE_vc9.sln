@@ -1,9 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LNE", "lne\LNE_vc9.vcproj", "{CCF46FBB-45FD-421E-AF36-981D65213DCF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LNE", "lne\LNE.vcproj", "{CCF46FBB-45FD-421E-AF36-981D65213DCF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test_vc9.vcproj", "{F94A9159-9623-43DA-A2C0-1F1851090050}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{F94A9159-9623-43DA-A2C0-1F1851090050}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CCF46FBB-45FD-421E-AF36-981D65213DCF} = {CCF46FBB-45FD-421E-AF36-981D65213DCF}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{89E22CF3-1DD3-464E-B5DD-FDEC51047903}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pproxy", "apps\pproxy\pproxy.vcproj", "{13F52BB8-5939-4AA6-BA49-E4C34D21A473}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CCF46FBB-45FD-421E-AF36-981D65213DCF} = {CCF46FBB-45FD-421E-AF36-981D65213DCF}
 	EndProjectSection
@@ -22,8 +29,15 @@ Global
 		{F94A9159-9623-43DA-A2C0-1F1851090050}.Debug|Win32.Build.0 = Debug|Win32
 		{F94A9159-9623-43DA-A2C0-1F1851090050}.Release|Win32.ActiveCfg = Release|Win32
 		{F94A9159-9623-43DA-A2C0-1F1851090050}.Release|Win32.Build.0 = Release|Win32
+		{13F52BB8-5939-4AA6-BA49-E4C34D21A473}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13F52BB8-5939-4AA6-BA49-E4C34D21A473}.Debug|Win32.Build.0 = Debug|Win32
+		{13F52BB8-5939-4AA6-BA49-E4C34D21A473}.Release|Win32.ActiveCfg = Release|Win32
+		{13F52BB8-5939-4AA6-BA49-E4C34D21A473}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{13F52BB8-5939-4AA6-BA49-E4C34D21A473} = {89E22CF3-1DD3-464E-B5DD-FDEC51047903}
 	EndGlobalSection
 EndGlobal

@@ -58,6 +58,7 @@ void DataBlock::ObjectDestroy(void)
 }
 
 DataBlockPool::DataBlockPool(void)
+	: RefObject(false)
 {
 	cache_head_ = NULL;
 	queue_head_ = NULL;
@@ -113,20 +114,20 @@ void DataBlockPool::ObjectDestroy(void)
 
 void DataBlockPool::Free(DataBlock *block)
 {
-	queue_lock_.Lock();
+	Lock();
 	BlockQueue *queue = queue_free_;
 	queue_free_ = queue->next;
 	queue->block = block;
 	queue->next = queue_head_;
 	queue_head_ = queue;
-	queue_lock_.Unlock();
+	Unlock();
 	Release();
 }
 
 DataBlock *DataBlockPool::Alloc(void)
 {
 	DataBlock *result = NULL;
-	queue_lock_.Lock();
+	Lock();
 	if(queue_head_ == NULL) {
 		char *buffer = static_cast<char *>(malloc(sizeof(BlockCache) + sizeof(BlockQueue) * cache_blocks_ + (sizeof(DataBlock) + capacity_) * cache_blocks_));
 		if(buffer)
@@ -140,7 +141,7 @@ DataBlock *DataBlockPool::Alloc(void)
 		queue->next = queue_free_;
 		queue_free_ = queue;
 	}
-	queue_lock_.Unlock();
+	Unlock();
 	if(result)
 		AddRef();
 	return result;

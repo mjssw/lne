@@ -44,10 +44,10 @@ public:
 	LNE_UINT Set(const char *address, int address_family = AF_UNSPEC);
 	LNE_UINT Set(LNE_UINT16 port, const char *address, int address_family = AF_UNSPEC);
 
-	LNE_UINT get_family(void) const;
-	LNE_UINT get_size(void) const;
-	const sockaddr *get_addr(void) const;
-	const char *get_addr_text(void) const;
+	LNE_UINT family(void) const;
+	LNE_UINT size(void) const;
+	const sockaddr *addr(void) const;
+	const char *addr_text(void) const;
 
 	// WARNING: only used for LNE
 	sockaddr *ready_raw_addr(void);
@@ -86,25 +86,25 @@ SockAddr::operator bool()
 }
 
 LNE_INLINE LNE_UINT
-SockAddr::get_family(void) const
+SockAddr::family(void) const
 {
 	return addr_.sa.sa_family;
 }
 
 LNE_INLINE LNE_UINT
-SockAddr::get_size(void) const
+SockAddr::size(void) const
 {
 	return size_;
 }
 
 LNE_INLINE const sockaddr *
-SockAddr::get_addr(void) const
+SockAddr::addr(void) const
 {
 	return &addr_.sa;
 }
 
 LNE_INLINE const char *
-SockAddr::get_addr_text(void) const
+SockAddr::addr_text(void) const
 {
 	return addr_text_;
 }

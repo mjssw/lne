@@ -61,8 +61,8 @@ LNE_UINT ThreadCondition::Wait(const TimeValue &tv)
 	TimeValue dest;
 	dest.Now();
 	dest += tv;
-	ts.tv_sec = dest.get_sec();
-	ts.tv_nsec = dest.get_usec() * 1000;
+	ts.tv_sec = dest.sec();
+	ts.tv_nsec = dest.usec() * 1000;
 	int ret = LNERR_UNKNOW;
 	if(pthread_mutex_lock(&mutex_) == 0) {
 		if(signal_) {

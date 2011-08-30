@@ -19,11 +19,13 @@
 #ifndef LNE_SOCKEVENTER_H
 #define LNE_SOCKEVENTER_H
 
-#include "BaseObject.h"
+#include "ExtendObject.h"
+#include "ObjectStack_T.h"
 
 LNE_NAMESPACE_BEGIN
 
 class SockEventer;
+class SockEventerPool;
 
 class LNE_Export SockPoller: public Abstract
 {
@@ -33,7 +35,7 @@ public:
 	virtual void UnBind(SockEventer *eventer) = 0;
 };
 
-class LNE_Export SockEventer: public Abstract
+class LNE_Export SockEventer: public RefObject
 {
 public:
 #if defined(LNE_WIN32)
@@ -46,37 +48,75 @@ public:
 #endif
 
 public:
-	SockEventer(void);
+	SockEventer(SockEventerPool *pool);
+	void *context();
+	void set_context(void *context);
+
 	virtual void Shutdown(void) = 0;
 	virtual bool IdleTimeout(void) = 0;
 	virtual void HandleRead(void);
 	virtual void HandleWrite(void);
 	virtual void HandleShutdown(void);
 	virtual void HandleIdleTimeout(void);
-	virtual bool HandleBind(SockPoller *poller) = 0;
+	virtual bool HandleBind(SockPoller *binder) = 0;
 	virtual void HandleTerminate(void) = 0;
 
 	// WARNING: only used for LNE
-	SockEventer *get_prev(void);
+	SockEventer *prev(void);
 	void set_prev(SockEventer *prev);
-	SockEventer *get_next(void);
+	SockEventer *next(void);
 	void set_next(SockEventer *prev);
-	time_t get_active(void);
+	time_t active(void);
 	void set_active(time_t active);
 
 protected:
-	SockPoller *get_poller(void);
+	SockPoller *poller(void);
 	void set_poller(SockPoller *poller);
+	void ObjectDestroy(void);
+	virtual void Clean(void) = 0;
 
 private:
 	SockPoller *poller_;
 	SockEventer *prev_;
 	SockEventer *next_;
 	time_t active_;
+	void *context_;
+	SockEventerPool *pool_;
 };
 
+class LNE_Export SockEventerPool: public RefObject
+{
+	friend class SockEventer;
+public:
+	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
+
+	SockEventerPool(LNE_UINT limit_cache);
+	~SockEventerPool(void);
+
+protected:
+	void ObjectDestroy(void);
+	virtual void PushObject(SockEventer *object);
+	virtual SockEventer *PopObject(void);
+
+private:
+	LNE_UINT limit_cache_;
+	ObjectStack<SockEventer *>  objects_;
+};
+
+LNE_INLINE void *
+SockEventer::context(void)
+{
+	return context_;
+}
+
+LNE_INLINE void
+SockEventer::set_context(void *context)
+{
+	context_ = context;
+}
+
 LNE_INLINE SockEventer *
-SockEventer::get_prev(void)
+SockEventer::prev(void)
 {
 	return prev_;
 }
@@ -88,7 +128,7 @@ SockEventer::set_prev(SockEventer *prev)
 }
 
 LNE_INLINE SockEventer *
-SockEventer::get_next(void)
+SockEventer::next(void)
 {
 	return next_;
 }
@@ -100,7 +140,7 @@ SockEventer::set_next(SockEventer *next)
 }
 
 LNE_INLINE time_t
-SockEventer::get_active(void)
+SockEventer::active(void)
 {
 	return active_;
 }
@@ -112,7 +152,7 @@ SockEventer::set_active(time_t active)
 }
 
 LNE_INLINE SockPoller *
-SockEventer::get_poller(void)
+SockEventer::poller(void)
 {
 	return poller_;
 }

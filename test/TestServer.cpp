@@ -23,27 +23,26 @@ public:
 			SockAddr addr_sock, addr_peer;
 			client->GetSockAddr(addr_sock);
 			client->GetPeerAddr(addr_peer);
-			printf("Spary accept %s <= %s\n", addr_sock.get_addr_text(), addr_peer.get_addr_text());
+			printf("Spary accept %s <= %s\n", addr_sock.addr_text(), addr_peer.addr_text());
 		}
 		DataBlock *blocks[2];
-		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->get_context());
-		printf("Spary [%llu] Recv Data: %u\n", index, block->get_size());
+		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->context());
+		printf("Spary [%llu] Recv Data: %u\n", index, block->size());
 		blocks[0] = block;
 		blocks[1] = block;
 		client->Send(blocks, 2);
-		block->Release();
 		if(count_++ > 2)
 			client->Shutdown();
 	}
 
 	void HandleShutdown(SockSpray *client) {
-		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->get_context());
+		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->context());
 		printf("Spary [%llu] Shutdown\n", index);
 		delete this;
 	}
 
 	void HandleTerminate(SockSpray *client) {
-		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->get_context());
+		LNE_UINT64 index = reinterpret_cast<LNE_UINT64>(client->context());
 		printf("Spary [%llu] Terminate\n", index);
 		delete this;
 	}
@@ -65,9 +64,11 @@ public:
 		pool_->Release();
 	}
 	void HandleClient(SockSpring *spring, SockPad client) {
-		SockSpray *spray = pool_->Alloc(client, new SprayHandler(), reinterpret_cast<void *>(++count_));
-		if(spray)
+		SockSpray *spray = pool_->Alloc(client, new SprayHandler());
+		if(spray) {
+			spray->set_context(reinterpret_cast<void *>(++count_));
 			reactor_->Bind(spray);
+		}
 		if(count_ > 2) {
 			spring->Shutdown();
 			spring->Release();
@@ -103,7 +104,7 @@ void TestServer()
 	SockSprayPool *spray_pool =	SockSprayPool::NewInstance(data_pool);
 	data_pool->Release();
 	SockSpringPool *spring_pool = SockSpringPool::NewInstance();
-	SockSpring *spring = spring_pool->Alloc(skpad, new SpringHandler(spray_pool, reactor), NULL);
+	SockSpring *spring = spring_pool->Alloc(skpad, new SpringHandler(spray_pool, reactor));
 	spray_pool->Release();
 	spring_pool->Release();
 	reactor->Bind(spring);

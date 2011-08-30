@@ -35,24 +35,24 @@ public:
 
 	bool IsFull(void) const;
 	bool IsEmpty(void) const;
-	char *get_buffer(void);
-	char *get_buffer_free(void);
-	char *get_buffer_end(void);
-	const char *get_buffer(void) const;
-	const char *get_buffer_free(void) const;
-	const char *get_buffer_end(void) const;
-	LNE_UINT get_size(void) const;
+	char *buffer(void);
+	char *buffer_free(void);
+	char *buffer_end(void);
+	const char *buffer(void) const;
+	const char *buffer_free(void) const;
+	const char *buffer_end(void) const;
+	LNE_UINT size(void) const;
 	LNE_UINT set_size(LNE_UINT size);
-	LNE_UINT get_capacity(void) const;
-	LNE_UINT get_free_size(void) const;
+	LNE_UINT capacity(void) const;
+	LNE_UINT free_size(void) const;
 
 private:
 	DataBlock(void);
 	~DataBlock(void);
 	void ObjectDestroy(void);
 
-	char *buffer_;
 	LNE_UINT size_; // customer variable, <= capacity_
+	char *buffer_;
 	LNE_UINT capacity_;
 	DataBlockPool *pool_;
 };
@@ -74,7 +74,7 @@ public:
 	static DataBlockPool *NewInstance(LNE_UINT capacity = DataBlock::DEFAULT_CAPACITY, LNE_UINT cache_blocks = DEFAULT_CACHE_BLOCKS);
 
 	DataBlock *Alloc(void);
-	LNE_UINT get_capacity(void) const;
+	LNE_UINT capacity(void) const;
 
 private:
 	DataBlockPool(void);
@@ -88,7 +88,6 @@ private:
 	BlockCache *cache_head_;
 	BlockQueue *queue_head_;
 	BlockQueue *queue_free_;
-	ThreadLock queue_lock_;
 };
 
 LNE_INLINE bool
@@ -104,55 +103,55 @@ DataBlock::IsEmpty(void) const
 }
 
 LNE_INLINE char *
-DataBlock::get_buffer(void)
+DataBlock::buffer(void)
 {
 	return buffer_;
 }
 
 LNE_INLINE const char *
-DataBlock::get_buffer(void) const
+DataBlock::buffer(void) const
 {
 	return buffer_;
 }
 
 LNE_INLINE char *
-DataBlock::get_buffer_free(void)
+DataBlock::buffer_free(void)
 {
 	return buffer_ + size_;
 }
 
 LNE_INLINE const char *
-DataBlock::get_buffer_free(void) const
+DataBlock::buffer_free(void) const
 {
 	return buffer_ + size_;
 }
 
 LNE_INLINE char *
-DataBlock::get_buffer_end(void)
+DataBlock::buffer_end(void)
 {
 	return buffer_ + capacity_;
 }
 
 LNE_INLINE const char *
-DataBlock::get_buffer_end(void) const
+DataBlock::buffer_end(void) const
 {
 	return buffer_ + capacity_;
 }
 
 LNE_INLINE LNE_UINT
-DataBlock::get_size(void) const
+DataBlock::size(void) const
 {
 	return size_;
 }
 
 LNE_INLINE LNE_UINT
-DataBlock::get_capacity(void) const
+DataBlock::capacity(void) const
 {
 	return capacity_;
 }
 
 LNE_INLINE LNE_UINT
-DataBlock::get_free_size(void) const
+DataBlock::free_size(void) const
 {
 	return capacity_ - size_;
 }
@@ -168,7 +167,7 @@ DataBlock::set_size(LNE_UINT size)
 }
 
 LNE_INLINE LNE_UINT
-DataBlockPool::get_capacity(void) const
+DataBlockPool::capacity(void) const
 {
 	return capacity_;
 }

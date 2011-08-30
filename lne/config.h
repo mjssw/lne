@@ -73,7 +73,7 @@ typedef unsigned long long LNE_UINT64;
 
 #if defined(NDEBUG)
 #define LNE_ASSERT_IF(f) \
-	if(!(f))
+	if(f)
 #define LNE_ASSERT_RETURN(f,t) \
 	if(!(f)) return t
 #define LNE_ASSERT_RETURN_VOID(f) \

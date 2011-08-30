@@ -35,7 +35,7 @@ public:
 	LNE_UINT Push(const T &object);
 
 	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+	LNE_UINT count(void) const;
 
 private:
 	ObjectList<T, cache_nodes_> list_;
@@ -66,13 +66,13 @@ LNE_UINT ObjectStack<T, cache_nodes_>::Push(const T &object)
 template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
 bool ObjectStack<T, cache_nodes_>::IsEmpty(void) const
 {
-	return get_count() == 0;
+	return count() == 0;
 }
 
 template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
-LNE_UINT ObjectStack<T, cache_nodes_>::get_count(void) const
+LNE_UINT ObjectStack<T, cache_nodes_>::count(void) const
 {
-	return list_.get_count();
+	return list_.count();
 }
 
 LNE_NAMESPACE_END

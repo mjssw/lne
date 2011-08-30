@@ -23,7 +23,6 @@
 #include "SockPad.h"
 #include "SockStream.h"
 #include "SockEventer.h"
-#include "SockObject.h"
 #include "ObjectQueue_T.h"
 
 LNE_NAMESPACE_BEGIN
@@ -41,29 +40,28 @@ public:
 	virtual void HandleTerminate(SockSpray *client) = 0;
 };
 
-class LNE_Export SockSpray: public SockEventer, public SockPoolable, public SockStream
+class LNE_Export SockSpray: public SockEventer, public SockStream
 {
 	friend class SockSprayPool;
 public:
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
-	void *get_context(void);
 
 	// WARNING: only used for LNE
-	SockSprayHandler *get_handler(void);
+	SockSprayHandler *handler(void);
 
 protected:
 	bool IdleTimeout(void);
 	void HandleRead(void);
 	void HandleWrite(void);
 	void HandleShutdown(void);
-	bool HandleBind(SockPoller *poller);
+	bool HandleBind(SockPoller *binder);
 	void HandleTerminate(void);
 	void HandleIdleTimeout(void);
 
 private:
-	SockSpray(SockBasePool *pool);
+	SockSpray(SockEventerPool *pool);
 	~SockSpray(void);
 	void Clean(void);
 	void __Shutdown(void);
@@ -77,7 +75,6 @@ private:
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;
 	SockSprayHandler *handler_;
-	void *context_;
 	ThreadLock thread_lock_;
 	LNE_UINT thread_count_;
 	// for send
@@ -119,38 +116,31 @@ private:
 #endif
 };
 
-class LNE_Export SockSprayPool : public SockBasePool
+class LNE_Export SockSprayPool : public SockEventerPool
 {
 	friend class SockSpray;
 	static const LNE_UINT DEFAULT_WRITE_CACHE = 128;
 public:
-	static SockSprayPool *NewInstance(DataBlockPool *data_pool, LNE_UINT limit_write_cache = DEFAULT_WRITE_CACHE, LNE_UINT limit_cache = SockBasePool::DEFAULT_LIMIT_CACHE);
-	SockSpray *Alloc(SockPad skpad, SockSprayHandler *handler, void *context);
+	static SockSprayPool *NewInstance(DataBlockPool *data_pool, LNE_UINT limit_write_cache = DEFAULT_WRITE_CACHE, LNE_UINT limit_cache = SockEventerPool::DEFAULT_LIMIT_CACHE);
+	SockSpray *Alloc(SockPad skpad, SockSprayHandler *handler);
 
 private:
 	SockSprayPool(LNE_UINT limit_cache);
 	~SockSprayPool(void);
-	void PushObject(SockPoolable *object);
 
 	DataBlockPool *data_pool_;
 	LNE_UINT limit_write_cache_;
 };
 
 LNE_INLINE SockSprayHandler *
-SockSpray::get_handler(void)
+SockSpray::handler(void)
 {
 	return handler_;
 }
 
-LNE_INLINE void *
-SockSpray::get_context(void)
-{
-	return context_;
-}
-
 LNE_INLINE
 SockSprayPool::SockSprayPool(LNE_UINT limit_cache)
-	: SockBasePool(limit_cache)
+	: SockEventerPool(limit_cache)
 {
 	data_pool_ = NULL;
 	limit_write_cache_ = 0;

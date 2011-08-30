@@ -60,8 +60,8 @@ LNE_UINT ThreadMutex::Acquire(const TimeValue &tv)
 	TimeValue dest;
 	dest.Now();
 	dest += tv;
-	ts.tv_sec = dest.get_sec();
-	ts.tv_nsec = dest.get_usec() * 1000;
+	ts.tv_sec = dest.sec();
+	ts.tv_nsec = dest.usec() * 1000;
 	if(pthread_mutex_timedlock(&mutex_, &ts) == 0)
 		return LNERR_OK;
 	if(errno == ETIMEDOUT)

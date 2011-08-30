@@ -91,7 +91,7 @@ SockReactor::~SockReactor(void)
 		SockEventer *p, *next = eventer_circle_;
 		do {
 			p = next;
-			next = next->get_next();
+			next = next->next();
 			p ->HandleTerminate();
 		} while(next != eventer_circle_);
 	}
@@ -141,9 +141,9 @@ void SockReactor::Bind(SockEventer *eventer)
 		eventer_circle_ = eventer;
 	} else {
 		eventer->set_next(eventer_circle_);
-		eventer->set_prev(eventer_circle_->get_prev());
-		eventer->get_prev()->set_next(eventer);
-		eventer->get_next()->set_prev(eventer);
+		eventer->set_prev(eventer_circle_->prev());
+		eventer->prev()->set_next(eventer);
+		eventer->next()->set_prev(eventer);
 		eventer_circle_ = eventer;
 	}
 	eventer->set_active(time(NULL));
@@ -152,17 +152,17 @@ void SockReactor::Bind(SockEventer *eventer)
 
 void SockReactor::UnBind(SockEventer *eventer)
 {
-	LNE_ASSERT_RETURN_VOID(eventer->get_prev() != NULL && eventer->get_next() != NULL);
+	LNE_ASSERT_RETURN_VOID(eventer->prev() != NULL && eventer->next() != NULL);
 	eventer_lock_.Lock();
-	if(eventer->get_prev() == eventer) {
+	if(eventer->prev() == eventer) {
 		// circle empty
 		LNE_ASSERT_IF(eventer == eventer_circle_) {
 			eventer_circle_ = NULL;
 		}
 	} else {
-		SockEventer *prev = eventer->get_prev();
-		prev->set_next(eventer->get_next());
-		prev->get_next()->set_prev(prev);
+		SockEventer *prev = eventer->prev();
+		prev->set_next(eventer->next());
+		prev->next()->set_prev(prev);
 		if(eventer_circle_ == eventer)
 			eventer_circle_ = prev;
 		// clean save
@@ -214,11 +214,11 @@ void SockReactor::Timer(void)
 			items = 0;
 			next = eventer_circle_;
 			do {
-				if(next->IdleTimeout() && time(&current) - next->get_active() > idle_timeout_) {
+				if(next->IdleTimeout() && time(&current) - next->active() > idle_timeout_) {
 					next->set_active(current);
 					next->HandleIdleTimeout();
 				}
-				next = next->get_next();
+				next = next->next();
 			} while(next != eventer_circle_ && items++ < DEFAULT_IDLE_CHECK_ITEMS);
 			eventer_circle_ = next;
 		}

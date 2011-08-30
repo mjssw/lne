@@ -23,18 +23,18 @@ void TestClient()
 	SockWaves *stream = SockWaves::NewInstance(skpad);
 	const char *query = "GET / HTTP/1.1\r\n\r\n";
 	DataBlock *block = DataBlock::NewInstance(1024 * 1024);
-	strcpy(block->get_buffer(), query);
-	block->set_size(static_cast<LNE_UINT>(strlen(block->get_buffer())));
+	strcpy(block->buffer(), query);
+	block->set_size(static_cast<LNE_UINT>(strlen(block->buffer())));
 	stream->Send(block);
 	while(stream->Recv(block, tv) == LNERR_OK) {
-		block->get_buffer()[block->get_size()] = '\0';
-		puts(block->get_buffer());
+		block->buffer()[block->size()] = '\0';
+		puts(block->buffer());
 	}
 	block->Release();
 	SockAddr addr_sock, addr_peer;
 	stream->GetSockAddr(addr_sock);
 	stream->GetPeerAddr(addr_peer);
-	printf("connect %s => %s\n", addr_sock.get_addr_text(), addr_peer.get_addr_text());
+	printf("connect %s => %s\n", addr_sock.addr_text(), addr_peer.addr_text());
 	stream->Release();
 	connector->Release();
 }

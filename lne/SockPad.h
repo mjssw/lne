@@ -32,8 +32,8 @@ public:
 	SockPad &operator = (SockPad &other);
 
 	operator bool(void);
-	int get_family();
-	SOCKET get_socket();
+	int family();
+	SOCKET socket();
 	void Attach(int family, SOCKET sock);
 	void Close();
 
@@ -79,13 +79,13 @@ SockPad::operator bool(void)
 }
 
 LNE_INLINE int
-SockPad::get_family()
+SockPad::family()
 {
 	return family_;
 }
 
 LNE_INLINE SOCKET
-SockPad::get_socket()
+SockPad::socket()
 {
 	return socket_;
 }
