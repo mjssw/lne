@@ -213,11 +213,13 @@ void SockReactor::Timer(void)
 			start = time(&current);
 			next = eventer_circle_;
 			do {
-				if(next->IdleTimeout() && current - next->active() > idle_timeout_) {
-					next->HandleIdleTimeout();
-					next->set_active(time(&current));
-				}
 				next = next->next();
+				if(next->IdleTimeout()) {
+					if(current - next->active() < idle_timeout_)
+						break;
+					next->HandleIdleTimeout();
+				}
+				next->set_active(time(&current));
 			} while(next != eventer_circle_ && current == start);
 			eventer_circle_ = next;
 		}
