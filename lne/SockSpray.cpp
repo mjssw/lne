@@ -64,8 +64,11 @@ bool SockSpray::HandleBind(SockPoller *binder)
 {
 	bool result = false;
 #if defined(LNE_WIN32)
+	DWORD bytes;
 	unsigned long value = 1;
-	if(ioctlsocket(skpad_.socket(), FIONBIO, &value) == 0) {
+	GUID guid = WSAID_DISCONNECTEX;
+	if(WSAIoctl(skpad_.socket(), SIO_GET_EXTENSION_FUNCTION_POINTER, &guid, sizeof(guid), &iocp_data_.disconnectex, sizeof(iocp_data_.disconnectex), &bytes, NULL, NULL) == 0
+			&& ioctlsocket(skpad_.socket(), FIONBIO, &value) == 0) {
 #else
 	int flags = fcntl(skpad_.socket(), F_GETFL);
 	if(flags >= 0 && fcntl(skpad_.socket(), F_SETFL, flags | O_NONBLOCK) == 0) {
@@ -133,6 +136,7 @@ void SockSpray::Clean(void)
 	memset(&shutdown_state_, 0, sizeof(shutdown_state_));
 #if defined(LNE_WIN32)
 	iocp_data_.count = 0;
+	iocp_data_.disconnectex = NULL;
 #elif defined(LNE_FREEBSD)
 	kevent_data_.num_eof = 0;
 #endif
@@ -236,23 +240,17 @@ void SockSpray::__Shutdown(void)
 		kevent_lock_.Unlock();
 #endif
 #if defined(LNE_WIN32)
-		shutdown(skpad_.socket(), SD_BOTH);
+		iocp_lock_.Lock();
+		if(iocp_data_.disconnectex(skpad_.socket(), &iocp_data_.overlap[IOCP_SHUTDOWN], 0, 0)
+				|| WSAGetLastError() == ERROR_IO_PENDING)
+			++iocp_data_.count;
+		else
+			shutdown_state_.already = true;
+		iocp_lock_.Unlock();
 #else
 		shutdown(skpad_.socket(), SHUT_RDWR);
 #endif
 	}
-#if defined(LNE_WIN32)
-	iocp_lock_.Lock();
-	if(iocp_data_.count > 0)
-		shutdown_state_.already = true;
-	else if(iocp_data_.count == 0) {
-		if(PostQueuedCompletionStatus(poller()->Handle(), 0, static_cast<ULONG_PTR>(skpad_.socket()), &iocp_data_.overlap[IOCP_SHUTDOWN]))
-			--iocp_data_.count;
-		else
-			shutdown_state_.already = true;
-	}
-	iocp_lock_.Unlock();
-#endif
 }
 
 void SockSpray::HandleWrite(void)
@@ -480,7 +478,13 @@ recv_data_next:
 
 void SockSpray::HandleShutdown(void)
 {
-#if defined(LNE_FREEBSD)
+#if defined(LNE_WIN32)
+	iocp_lock_.Lock();
+	--iocp_data_.count;
+	iocp_lock_.Unlock();
+#elif defined(LNE_LINUX)
+	epoll_ctl(poller()->Handle(), EPOLL_CTL_DEL, skpad_.socket(), &epoll_data_);
+#elif defined(LNE_FREEBSD)
 	bool to_handle = false;
 	kevent_lock_.Lock();
 	if(--kevent_data_.num_eof == 0)
@@ -520,6 +524,14 @@ void SockSpray::LeaveThreadSafe(void)
 	if(shutdown_state_.already)
 		++num_flag;
 	shutdown_lock_.Unlock();
+#if defined(LNE_WIN32)
+	if(num_flag > 0) {
+		iocp_lock_.Lock();
+		if(iocp_data_.count > 0)
+			num_flag = 0;
+		iocp_lock_.Unlock();
+	}
+#endif
 	// process shutdown
 	if(num_flag == 2) {
 		poller()->UnBind(this);

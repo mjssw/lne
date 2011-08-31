@@ -204,22 +204,21 @@ void *SockReactor::ThreadService(void *parameter)
 
 void SockReactor::Timer(void)
 {
-	LNE_UINT items;
-	time_t current;
+	time_t current, start;
 	SockEventer *next;
 	TimeValue timeout(DEFAULT_IDLE_CHECK_INTERVAL, 0);
 	do {
 		eventer_lock_.Lock();
 		if(eventer_circle_) {
-			items = 0;
+			start = time(&current);
 			next = eventer_circle_;
 			do {
-				if(next->IdleTimeout() && time(&current) - next->active() > idle_timeout_) {
-					next->set_active(current);
+				if(next->IdleTimeout() && current - next->active() > idle_timeout_) {
 					next->HandleIdleTimeout();
+					next->set_active(time(&current));
 				}
 				next = next->next();
-			} while(next != eventer_circle_ && items++ < DEFAULT_IDLE_CHECK_ITEMS);
+			} while(next != eventer_circle_ && current == start);
 			eventer_circle_ = next;
 		}
 		eventer_lock_.Unlock();
@@ -236,6 +235,7 @@ void SockReactor::Service(void)
 	DWORD timeout = exit_check_interval_ * 1000;
 	SockEventer::IOCP_OVERLAPPED *overlap;
 	do {
+		overlap = NULL;
 		if(GetQueuedCompletionStatus(poller_, &bytes, &key, reinterpret_cast<LPOVERLAPPED *>(&overlap), timeout)) {
 			overlap->owner->set_active(time(NULL));
 			if(overlap->type == SockEventer::IOCP_READ)
@@ -243,6 +243,9 @@ void SockReactor::Service(void)
 			else if(overlap->type == SockEventer::IOCP_WRITE)
 				overlap->owner->HandleWrite();
 			else
+				overlap->owner->HandleShutdown();
+		} else if(GetLastError() != WAIT_TIMEOUT) {
+			if(overlap)
 				overlap->owner->HandleShutdown();
 		}
 	} while(!exit_request_);

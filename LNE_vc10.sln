@@ -11,6 +11,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{67A15B51-273E-4CA9-8C66-AA1C317CB990}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pproxy", "apps\pproxy\pproxy.vcxproj", "{13F52BB8-5939-4AA6-BA49-E4C34D21A473}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B86A70A-22B0-49D1-BF1E-EFBCFF026594} = {7B86A70A-22B0-49D1-BF1E-EFBCFF026594}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

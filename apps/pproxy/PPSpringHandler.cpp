@@ -31,28 +31,28 @@ void PPSpringHandler::HandleClient(SockSpring *spring, SockPad client)
 {
 	SockPad child;
 	if(connector_->Connect(child) == LNERR_OK) {
-		SockSpray *local = pool_->Alloc(client, &s_spray_handler);
-		SockSpray *remote = pool_->Alloc(child, &s_spray_handler);
-		if(local != NULL && remote != NULL) {
+		SockSpray *in = pool_->Alloc(client, &s_spray_handler);
+		SockSpray *out = pool_->Alloc(child, &s_spray_handler);
+		if(in != NULL && out != NULL) {
 			LNE_UINT index;
 			lock_.Lock();
 			index = ++count_;
 			lock_.Unlock();
 			SockAddr addr_sock, addr_peer;
-			remote->GetSockAddr(addr_sock);
-			local->GetPeerAddr(addr_peer);
-			printf("[%u] connect source:(%s), local:(%s)\n", index, addr_peer.addr_text(), addr_sock.addr_text());
-			local->set_context(remote);
-			remote->set_context(local);
-			local->AddRef();
-			remote->AddRef();
-			reactor_->Bind(local);
-			reactor_->Bind(remote);
+			in->GetPeerAddr(addr_peer);
+			out->GetSockAddr(addr_sock);
+			printf("[%u] connect in:[%p](%s), out:[%p](%s)\n", index, in, addr_peer.addr_text(), out, addr_sock.addr_text());
+			in->set_context(out);
+			out->set_context(in);
+			in->AddRef();
+			out->AddRef();
+			reactor_->Bind(in);
+			reactor_->Bind(out);
 		} else {
-			if(local)
-				local->Release();
-			if(remote)
-				remote->Release();
+			if(in)
+				in->Release();
+			if(out)
+				out->Release();
 		}
 	}
 }

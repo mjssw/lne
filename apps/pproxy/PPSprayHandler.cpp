@@ -19,7 +19,7 @@ void PPSprayHandler::HandleShutdown(SockSpray *client)
 	SockAddr addr_sock, addr_peer;
 	client->GetSockAddr(addr_sock);
 	client->GetPeerAddr(addr_peer);
-	printf("    shutdown local:(%s), remote:(%s)\n", addr_sock.addr_text(), addr_peer.addr_text());
+	printf("  [%p] shutdown local:(%s), remote:(%s)\n", client, addr_sock.addr_text(), addr_peer.addr_text());
 	SockSpray *pair = static_cast<SockSpray *>(client->context());
 	if(pair != NULL) {
 		client->set_context(NULL);

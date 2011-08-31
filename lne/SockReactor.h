@@ -29,7 +29,6 @@ class LNE_Export SockReactor: public RefObject, public Available, public SockPol
 	static const LNE_UINT EXIT_CHECK_INTERVAL = 10;           // second
 	static const LNE_UINT DEFAULT_IDLE_TIMEOUT = 5 * 60 * 60; // second
 	static const LNE_UINT DEFAULT_IDLE_CHECK_INTERVAL = 5;    // second
-	static const LNE_UINT DEFAULT_IDLE_CHECK_ITEMS = 15;
 public:
 	static SockReactor *NewInstance(LNE_UINT workers, LNE_UINT idle_timeout = DEFAULT_IDLE_TIMEOUT, LNE_UINT exit_check_interval = EXIT_CHECK_INTERVAL);
 

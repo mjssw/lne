@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 		printf("SockConnector cannot create [%s]\n", remote_addr.addr_text());
 		return -1;
 	}
-	AutoRelease<SockReactor>reactor(SockReactor::NewInstance(10));
+	AutoRelease<SockReactor>reactor(SockReactor::NewInstance(10, 5));
 	if(!reactor) {
 		printf("SockReactor cannot create\n");
 		return -1;

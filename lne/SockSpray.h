@@ -104,6 +104,7 @@ private:
 		LNE_INT count;
 		WSABUF buffer;
 		IOCP_OVERLAPPED overlap[IOCP_ARRAY_MAX];
+		LPFN_DISCONNECTEX disconnectex;
 	} iocp_data_;
 	ThreadLock iocp_lock_;
 #elif defined(LNE_LINUX)
