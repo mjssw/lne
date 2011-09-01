@@ -19,23 +19,25 @@
 #ifndef LNE_THREADSEMAPHORE_H
 #define LNE_THREADSEMAPHORE_H
 
-#include "BaseObject.h"
 #include "TimeValue.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadSemaphore: public Available, public NonCopyable
+class LNE_Export ThreadSemaphore: public Available
 {
 public:
 	ThreadSemaphore(LNE_UINT count = 1, LNE_UINT max = 0x7FFFFFFF);
 	~ThreadSemaphore(void);
-
 	LNE_UINT TryAcquire(void);
 	LNE_UINT Acquire(void);
 	LNE_UINT Acquire(const TimeValue &tv);
 	LNE_UINT Release(void);
 
 private:
+	ThreadSemaphore(const ThreadSemaphore &);
+	ThreadSemaphore &operator=(const ThreadSemaphore &);
+
 #if defined(LNE_WIN32)
 	HANDLE sem_;
 #else

@@ -24,7 +24,6 @@
     <ClInclude Include="config-win32.h" />
     <ClInclude Include="DataBlock.h" />
     <ClInclude Include="ExtendObject.h" />
-    <ClInclude Include="lne.h" />
     <ClInclude Include="ObjectList_T.h" />
     <ClInclude Include="ObjectQueue_T.h" />
     <ClInclude Include="ObjectStack_T.h" />

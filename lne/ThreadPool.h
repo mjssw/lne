@@ -27,7 +27,7 @@ LNE_NAMESPACE_BEGIN
 
 class ThreadPool;
 
-class LNE_Export ThreadTask: public Abstract, public NonCopyable
+class LNE_Export ThreadTask: public Abstract
 {
 	friend class ThreadPool;
 public:
@@ -36,6 +36,9 @@ public:
 	virtual void Discard(void) = 0;
 
 private:
+	ThreadTask(const ThreadTask &);
+	ThreadTask &operator=(const ThreadTask &);
+
 	ThreadTask *next_;
 };
 

@@ -31,7 +31,7 @@ public:
 	virtual void Terminate(void) = 0;
 };
 
-class LNE_Export Thread: public Available, public NonCopyable
+class LNE_Export Thread: public Available
 {
 public:
 	static Thread *NewInstance(Runnable *run);

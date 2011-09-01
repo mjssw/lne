@@ -28,10 +28,6 @@ Abstract::~Abstract(void)
 {
 }
 
-NonCopyable::NonCopyable(void)
-{
-}
-
 Available::Available(void)
 {
 	available_ = false;

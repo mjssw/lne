@@ -30,15 +30,6 @@ public:
 	virtual ~Abstract(void) = 0;
 };
 
-class LNE_Export NonCopyable
-{
-public:
-	NonCopyable(void);
-private:
-	NonCopyable(const NonCopyable &);
-	const NonCopyable &operator =(const NonCopyable &);
-};
-
 class LNE_Export Available
 {
 public:
