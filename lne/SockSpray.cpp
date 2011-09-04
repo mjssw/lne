@@ -22,8 +22,8 @@ LNE_NAMESPACE_USING
 
 SockSpray::SockSpray(SockEventerPool *pool)
 	: SockEventer(pool),
-	  pool_(dynamic_cast<SockSprayPool *>(pool)->data_pool_),
-	  limit_write_cache_(dynamic_cast<SockSprayPool *>(pool)->limit_write_cache_),
+	  pool_(static_cast<SockSprayPool *>(pool)->data_pool_),
+	  limit_write_cache_(static_cast<SockSprayPool *>(pool)->limit_write_cache_),
 	  thread_lock_(true), send_lock_(true), recv_lock_(true), shutdown_lock_(true)
 {
 	enable_idle_check_ = true;
@@ -562,7 +562,7 @@ SockSprayPool *SockSprayPool::NewInstance(DataBlockPool *data_pool, LNE_UINT lim
 SockSpray *SockSprayPool::Alloc(SockPad skpad, SockSprayHandler *handler)
 {
 	LNE_ASSERT_RETURN(skpad && handler != NULL, NULL);
-	SockSpray *result = dynamic_cast<SockSpray *>(PopObject());
+	SockSpray *result = static_cast<SockSpray *>(PopObject());
 	if(result == NULL) {
 		try {
 			result = new SockSpray(this);

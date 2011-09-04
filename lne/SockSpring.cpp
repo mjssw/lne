@@ -181,7 +181,7 @@ SockSpringPool *SockSpringPool::NewInstance(LNE_UINT limit_cache)
 
 SockSpring *SockSpringPool::Alloc(SockPad skpad, SockSpringHandler *handler)
 {
-	SockSpring *result = dynamic_cast<SockSpring *>(PopObject());
+	SockSpring *result = static_cast<SockSpring *>(PopObject());
 	if(result == NULL) {
 		try {
 			result = new SockSpring(this);
