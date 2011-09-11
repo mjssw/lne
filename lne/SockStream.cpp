@@ -20,31 +20,20 @@
 
 LNE_NAMESPACE_USING
 
-SockStream::SockStream(void)
-{
-	socket_ = INVALID_SOCKET;
-}
-
-SockStream::~SockStream(void)
-{
-	if(socket_ != INVALID_SOCKET)
-		closesocket(socket_);
-}
-
 LNE_UINT SockStream::GetSockAddr(SockAddr &addr)
 {
-	char address[sizeof(sockaddr_in6)];
-	socklen_t len = sizeof(sockaddr_in6);
-	if(getsockname(socket_, reinterpret_cast<sockaddr *>(address), &len) != 0)
-		return LNERR_UNKNOW;
-	return addr.Set(reinterpret_cast<sockaddr *>(address), len);
+	if(getsockname(skpad_.socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
+		addr.generate_addr_text();
+		return LNERR_OK;
+	}
+	return LNERR_UNKNOW;
 }
 
 LNE_UINT SockStream::GetPeerAddr(SockAddr &addr)
 {
-	char address[sizeof(sockaddr_in6)];
-	socklen_t len = sizeof(sockaddr_in6);
-	if(getpeername(socket_, reinterpret_cast<sockaddr *>(address), &len) != 0)
-		return LNERR_UNKNOW;
-	return addr.Set(reinterpret_cast<sockaddr *>(address), len);
+	if(getpeername(skpad_.socket(), addr.ready_raw_addr(), &addr.ready_raw_size()) == 0) {
+		addr.generate_addr_text();
+		return LNERR_OK;
+	}
+	return LNERR_UNKNOW;
 }

@@ -28,11 +28,8 @@ LNE_NAMESPACE_BEGIN
 
 class LNE_Export SockWaves : public SockStream
 {
-	friend class SockPoller;
-	friend class SockAcceptor;
-	friend class SockConnector;
 public:
-	static SockWaves *NewInstance(SockPad sock);
+	static SockWaves *NewInstance(SockPad skpad);
 	void Release();
 	LNE_UINT Send(DataBlock *block);
 	LNE_UINT Recv(DataBlock *block);
@@ -44,7 +41,17 @@ private:
 	LNE_UINT Recv(DataBlock *block, const TimeValue *tv);
 };
 
-#include "SockWaves.inl"
+LNE_INLINE LNE_UINT
+SockWaves::Recv(DataBlock *block)
+{
+	return Recv(block, NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockWaves::Recv(DataBlock *block, const TimeValue &tv)
+{
+	return Recv(block, &tv);
+}
 
 LNE_NAMESPACE_END
 

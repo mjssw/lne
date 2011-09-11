@@ -28,13 +28,13 @@ SockWaves::~SockWaves(void)
 {
 }
 
-SockWaves *SockWaves::NewInstance(SockPad sock)
+SockWaves *SockWaves::NewInstance(SockPad skpad)
 {
-	LNE_ASSERT_RETURN(sock, NULL);
+	LNE_ASSERT_RETURN(skpad, NULL);
 	SockWaves *result = NULL;
 	try {
 		result = new SockWaves();
-		result->socket_ = sock.Detach();
+		result->skpad_ = skpad;
 	} catch(std::bad_alloc) {
 	}
 	return result;
@@ -47,13 +47,13 @@ void SockWaves::Release()
 
 LNE_UINT SockWaves::Send(DataBlock *block)
 {
-	LNE_ASSERT_RETURN(block != NULL && block->get_size() > 0, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(block != NULL && block->size() > 0, LNERR_PARAMETER);
 	ssize_t len;
 #if defined(LNE_WIN32)
-	len = send(socket_, block->get_buffer(), block->get_size(), 0);
+	len = send(skpad_.socket(), block->buffer(), block->size(), 0);
 #else
 	do {
-		len = send(socket_, block->get_buffer(), block->get_size(), MSG_NOSIGNAL);
+		len = send(skpad_.socket(), block->buffer(), block->size(), MSG_NOSIGNAL);
 	} while(len == SOCKET_ERROR && errno == EINTR);
 #endif
 	if(len < 0)
@@ -63,21 +63,21 @@ LNE_UINT SockWaves::Send(DataBlock *block)
 
 LNE_UINT SockWaves::Recv(DataBlock *block, const TimeValue *tv)
 {
-	LNE_ASSERT_RETURN(block != NULL && block->get_capacity() > 0, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(block != NULL && block->capacity() > 0, LNERR_PARAMETER);
 	if(tv) {
 		fd_set fds;
 		FD_ZERO(&fds);
-		FD_SET(socket_, &fds);
+		FD_SET(skpad_.socket(), &fds);
 		TimeValue timeout(*tv);
-		if(select(static_cast<int>(socket_ + 1), &fds, NULL, NULL, static_cast<timeval *>(timeout)) < 1)
+		if(select(static_cast<int>(skpad_.socket() + 1), &fds, NULL, NULL, static_cast<timeval *>(timeout)) < 1)
 			return LNERR_TIMEOUT;
 	}
 	ssize_t len;
 #if defined(LNE_WIN32)
-	len = recv(socket_, block->get_buffer(), block->get_capacity(), 0);
+	len = recv(skpad_.socket(), block->buffer(), block->capacity(), 0);
 #else
 	do {
-		len = recv(socket_, block->get_buffer(), block->get_capacity(), 0);
+		len = recv(skpad_.socket(), block->buffer(), block->capacity(), 0);
 	} while(len == SOCKET_ERROR && errno == EINTR);
 #endif
 	if(len < 0)

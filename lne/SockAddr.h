@@ -19,7 +19,7 @@
 #ifndef LNE_SOCKADDR_H
 #define LNE_SOCKADDR_H
 
-#include "BaseObject.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 
@@ -40,29 +40,87 @@ public:
 	SockAddr &operator =(const SockAddr &other);
 	void Set(const sockaddr_in &in4);
 	void Set(const sockaddr_in6 &in6);
-	LNE_UINT Set(const sockaddr *addr, int len);
 	LNE_UINT Set(LNE_UINT16 port, int address_family = AF_UNSPEC);
 	LNE_UINT Set(const char *address, int address_family = AF_UNSPEC);
 	LNE_UINT Set(LNE_UINT16 port, const char *address, int address_family = AF_UNSPEC);
-	
-	LNE_UINT get_family(void) const;
-	LNE_UINT get_size(void) const;
-	const sockaddr *get_addr(void) const;
-	const char* get_addr_text(void) const;
+
+	LNE_UINT family(void) const;
+	LNE_UINT size(void) const;
+	const sockaddr *addr(void) const;
+	const char *addr_text(void) const;
+
+	// WARNING: only used for LNE
+	sockaddr *ready_raw_addr(void);
+	socklen_t &ready_raw_size(void);
+	void generate_addr_text(void);
 
 private:
 	void Reset();
+	LNE_UINT Set(const sockaddr *addr, socklen_t len);
 
-	LNE_UINT family_;
-	LNE_UINT size_;
+	socklen_t size_;
 	union {
+		sockaddr     sa;
 		sockaddr_in  in4;
 		sockaddr_in6 in6;
 	} addr_;
-	char addr_text_[INET6_ADDRSTRLEN];
+	char addr_text_[INET6_ADDRSTRLEN + 1];
 };
 
-#include "SockAddr.inl"
+LNE_INLINE void
+SockAddr::Set(const sockaddr_in &in4)
+{
+	Set(reinterpret_cast<const sockaddr *>(&in4), sizeof(in4));
+}
+
+LNE_INLINE void
+SockAddr::Set(const sockaddr_in6 &in6)
+{
+	Set(reinterpret_cast<const sockaddr *>(&in6), sizeof(in6));
+}
+
+LNE_INLINE
+SockAddr::operator bool()
+{
+	return addr_.sa.sa_family != AF_UNSPEC && size_ > 0;
+}
+
+LNE_INLINE LNE_UINT
+SockAddr::family(void) const
+{
+	return addr_.sa.sa_family;
+}
+
+LNE_INLINE LNE_UINT
+SockAddr::size(void) const
+{
+	return size_;
+}
+
+LNE_INLINE const sockaddr *
+SockAddr::addr(void) const
+{
+	return &addr_.sa;
+}
+
+LNE_INLINE const char *
+SockAddr::addr_text(void) const
+{
+	return addr_text_;
+}
+
+LNE_INLINE sockaddr *
+SockAddr::ready_raw_addr(void)
+{
+	return &addr_.sa;
+}
+
+LNE_INLINE socklen_t &
+SockAddr::ready_raw_size(void)
+{
+	size_ = sizeof(addr_);
+	return size_;
+}
 
 LNE_NAMESPACE_END
 

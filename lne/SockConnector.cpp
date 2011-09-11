@@ -49,11 +49,11 @@ void SockConnector::Release(void)
 	delete this;
 }
 
-LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeValue *tv)
+LNE_UINT SockConnector::Connect(SockPad &skpad, const SockAddr &addr, const TimeValue *tv)
 {
 	LNE_UINT result = LNERR_UNKNOW;
-	sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
-	if(sock) {
+	SOCKET sock = socket(addr.family(), SOCK_STREAM, IPPROTO_TCP);
+	if(sock != INVALID_SOCKET) {
 		if(tv) {
 #if defined(LNE_WIN32)
 			unsigned long value = 1;
@@ -62,7 +62,7 @@ LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeV
 			int flags = fcntl(sock, F_GETFL);
 			if(flags >= 0 && fcntl(sock, F_SETFL, flags | O_NONBLOCK) == 0) {
 #endif
-				connect(sock, addr.get_addr(), addr.get_size());
+				connect(sock, addr.addr(), addr.size());
 				fd_set fds;
 				FD_ZERO(&fds);
 				FD_SET((SOCKET)sock, &fds);
@@ -80,11 +80,11 @@ LNE_UINT SockConnector::Connect(SockPad &sock, const SockAddr &addr, const TimeV
 				}
 			}
 		} else {
-			if(connect(sock, addr.get_addr(), addr.get_size()) == 0)
+			if(connect(sock, addr.addr(), addr.size()) == 0)
 				result = LNERR_OK;
 		}
-		if(result != LNERR_OK)
-			sock = INVALID_SOCKET;
+		if(result == LNERR_OK)
+			skpad.Attach(addr.family(), sock);
 	}
 	return result;
 }

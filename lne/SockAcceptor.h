@@ -19,31 +19,43 @@
 #ifndef LNE_SOCKACCEPTOR_H
 #define LNE_SOCKACCEPTOR_H
 
-#include "BaseObject.h"
-#include "SockWaves.h"
+#include "SockPad.h"
+#include "SockAddr.h"
+#include "TimeValue.h"
 
 LNE_NAMESPACE_BEGIN
 
 class LNE_Export SockAcceptor
 {
 public:
+	static LNE_UINT NewInstance(SockPad &skpad, const SockAddr &addr, LNE_UINT backlog = 5);
 	static SockAcceptor *NewInstance(const SockAddr &addr, LNE_UINT backlog = 5, const TimeValue *tv = NULL);
 	void Release(void);
 
-	LNE_UINT Accept(SockPad& sock);
-	LNE_UINT Accept(SockPad& sock, const TimeValue &tv);
-	LNE_UINT Accept(SockPad& sock, const TimeValue *tv);
+	LNE_UINT Accept(SockPad &skpad);
+	LNE_UINT Accept(SockPad &skpad, const TimeValue &tv);
+	LNE_UINT Accept(SockPad &skpad, const TimeValue *tv);
 
 private:
 	SockAcceptor(void);
 	~SockAcceptor(void);
 
-	SOCKET socket_;
+	SockPad skpad_;
 	bool use_timeout_;
 	TimeValue timeout_;
 };
 
-#include "SockAcceptor.inl"
+LNE_INLINE LNE_UINT
+SockAcceptor::Accept(SockPad &skpad)
+{
+	return Accept(skpad, use_timeout_ ? &timeout_ : NULL);
+}
+
+LNE_INLINE LNE_UINT
+SockAcceptor::Accept(SockPad &skpad, const TimeValue &tv)
+{
+	return Accept(skpad, &tv);
+}
 
 LNE_NAMESPACE_END
 

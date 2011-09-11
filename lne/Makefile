@@ -10,6 +10,7 @@ MAJORVN := $(firstword $(subst ., ,$(VERSION)))
 CC = g++
 LN = ln -sf
 CFLAGS += -Wall -fPIC
+CXXFLAGS +=
 LDFLAGS += -shared -pthread
 PREFIX = /usr
 LNNAME = liblne.so
@@ -19,6 +20,7 @@ OBJS = $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
 ifeq ($(RELEASE),y)
 	CFLAGS += -O3 -DNDEBUG
+	CXXFLAGS += -fno-rtti -fvisibility-inlines-hidden
 	LDFLAGS += -s
 else
 	CFLAGS += -g -ggdb -rdynamic
@@ -26,12 +28,10 @@ endif
 
 all: $(TARGET)
 
-%.o: %.cpp %.inl %.h
-	$(CC) $(CFLAGS) -c $< -o $@
 %.o: %.cpp %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $(TARGET) $(OBJS) -Wl,--soname=$(SONAME)
@@ -45,7 +45,7 @@ install: all
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/lne
 	cp -p $(TARGET) $(PREFIX)/lib
-	cp -p *.h *.inl $(PREFIX)/include/lne
+	cp -p *.h $(PREFIX)/include/lne
 	$(LN) $(PREFIX)/lib/$(TARGET) $(PREFIX)/lib/$(SONAME)
 	$(LN) $(PREFIX)/lib/$(SONAME) $(PREFIX)/lib/$(LNNAME)
 

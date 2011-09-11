@@ -24,6 +24,7 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <mswsock.h>
 #include <windows.h>
 #include <time.h>
 #include <sys/timeb.h>
@@ -38,6 +39,7 @@
 #pragma warning(disable:4251)
 #pragma warning(disable:4996)
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "mswsock.lib")
 
 #if LNE_EXPORTS
 # define LNE_Export __declspec (dllexport)

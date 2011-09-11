@@ -19,16 +19,28 @@
 #ifndef LNE_SOCKEVENTER_H
 #define LNE_SOCKEVENTER_H
 
-#include "BaseObject.h"
+#include "ExtendObject.h"
+#include "ObjectStack_T.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export SockEventer: public Abstract
+class SockEventer;
+class SockEventerPool;
+
+class LNE_Export SockPoller: public Abstract
+{
+public:
+	virtual POLLER Handle(void) = 0;
+	virtual void Bind(SockEventer *eventer) = 0;
+	virtual void UnBind(SockEventer *eventer) = 0;
+};
+
+class LNE_Export SockEventer: public RefObject
 {
 public:
 #if defined(LNE_WIN32)
-	enum {IOCP_WRITE = 0, IOCP_READ = 1, IOCP_SHUTDOWN = 2};
-	typedef struct : public WSAOVERLAPPED{
+	enum {IOCP_WRITE = 0, IOCP_READ, IOCP_SHUTDOWN, IOCP_ARRAY_MAX};
+	typedef struct : public WSAOVERLAPPED {
 		WSAOVERLAPPED overlap;
 		DWORD type;
 		SockEventer *owner;
@@ -36,14 +48,120 @@ public:
 #endif
 
 public:
-	SockEventer(void);
-	virtual bool Bind(POLLER poller) = 0;
+	SockEventer(SockEventerPool *pool);
+	void *context();
+	void set_context(void *context);
+
+	virtual void Shutdown(void) = 0;
+	virtual bool IdleTimeout(void) = 0;
 	virtual void HandleRead(void);
 	virtual void HandleWrite(void);
 	virtual void HandleShutdown(void);
+	virtual void HandleIdleTimeout(void);
+	virtual bool HandleBind(SockPoller *binder) = 0;
+	virtual void HandleTerminate(void) = 0;
+
+	// WARNING: only used for LNE
+	SockEventer *prev(void);
+	void set_prev(SockEventer *prev);
+	SockEventer *next(void);
+	void set_next(SockEventer *prev);
+	time_t active(void);
+	void set_active(time_t active);
+
+protected:
+	SockPoller *poller(void);
+	void set_poller(SockPoller *poller);
+	void ObjectDestroy(void);
+	virtual void Clean(void) = 0;
+
+private:
+	SockPoller *poller_;
+	SockEventer *prev_;
+	SockEventer *next_;
+	time_t active_;
+	void *context_;
+	SockEventerPool *pool_;
 };
 
-#include "SockEventer.inl"
+class LNE_Export SockEventerPool: public RefObject
+{
+	friend class SockEventer;
+public:
+	static const LNE_UINT DEFAULT_LIMIT_CACHE = 128;
+
+	SockEventerPool(LNE_UINT limit_cache);
+	~SockEventerPool(void);
+
+protected:
+	void ObjectDestroy(void);
+	virtual void PushObject(SockEventer *object);
+	virtual SockEventer *PopObject(void);
+
+private:
+	LNE_UINT limit_cache_;
+	ObjectStack<SockEventer *>  objects_;
+};
+
+LNE_INLINE void *
+SockEventer::context(void)
+{
+	return context_;
+}
+
+LNE_INLINE void
+SockEventer::set_context(void *context)
+{
+	context_ = context;
+}
+
+LNE_INLINE SockEventer *
+SockEventer::prev(void)
+{
+	return prev_;
+}
+
+LNE_INLINE void
+SockEventer::set_prev(SockEventer *prev)
+{
+	prev_ = prev;
+}
+
+LNE_INLINE SockEventer *
+SockEventer::next(void)
+{
+	return next_;
+}
+
+LNE_INLINE void
+SockEventer::set_next(SockEventer *next)
+{
+	next_ = next;
+}
+
+LNE_INLINE time_t
+SockEventer::active(void)
+{
+	return active_;
+}
+
+LNE_INLINE void
+SockEventer::set_active(time_t active)
+{
+	active_ = active;
+}
+
+LNE_INLINE SockPoller *
+SockEventer::poller(void)
+{
+	return poller_;
+}
+
+LNE_INLINE void
+SockEventer::set_poller(SockPoller *poller)
+{
+	poller_ = poller;
+}
 
 LNE_NAMESPACE_END
 

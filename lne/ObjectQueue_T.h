@@ -35,13 +35,45 @@ public:
 	LNE_UINT Append(const T &object);
 
 	bool IsEmpty(void) const;
-	LNE_UINT get_count(void) const;
+	LNE_UINT count(void) const;
 
 private:
 	ObjectList<T, cache_nodes_> list_;
 };
 
-#include "ObjectQueue_T.inl"
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+ObjectQueue<T, cache_nodes_>::ObjectQueue(void)
+{
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+ObjectQueue<T, cache_nodes_>::~ObjectQueue(void)
+{
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectQueue<T, cache_nodes_>::Extract(T &object)
+{
+	return list_.PopFront(object);
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectQueue<T, cache_nodes_>::Append(const T &object)
+{
+	return list_.PushBack(object);
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+bool ObjectQueue<T, cache_nodes_>::IsEmpty(void) const
+{
+	return count() == 0;
+}
+
+template<typename T, LNE_UINT cache_nodes_> LNE_INLINE
+LNE_UINT ObjectQueue<T, cache_nodes_>::count(void) const
+{
+	return list_.count();
+}
 
 LNE_NAMESPACE_END
 

@@ -1,9 +1,11 @@
 ipch
 Debug
 Release
+*Upgrade*
 bin
 obj
 *~
+*~HEAD
 *.bak
 *.ncb
 *.obj
@@ -16,6 +18,7 @@ obj
 *.log
 *.exe
 *.orig
+*.cppb
 *.o
 *.swp
 *.so

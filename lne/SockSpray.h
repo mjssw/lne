@@ -23,53 +23,59 @@
 #include "SockPad.h"
 #include "SockStream.h"
 #include "SockEventer.h"
-#include "SockObject.h"
 #include "ObjectQueue_T.h"
 
 LNE_NAMESPACE_BEGIN
 
 class DataBlockPool;
-class SockPoller;
+class SockReactor;
 class SockSpray;
-class SockSprayFactory;
+class SockSprayPool;
 
-class LNE_Export SockSprayHander: public Abstract
+class LNE_Export SockSprayHandler: public Abstract
 {
 public:
 	virtual void HandleData(SockSpray *client, DataBlock *block) = 0;
 	virtual void HandleShutdown(SockSpray *client) = 0;
+	virtual void HandleTerminate(SockSpray *client) = 0;
 };
 
-class LNE_Export SockSpray: public SockPoolable, public SockStream, public SockEventer
+class LNE_Export SockSpray: public SockEventer, public SockStream
 {
-	friend class SockSprayFactory;
+	friend class SockSprayPool;
 public:
-	bool Bind(POLLER poller);
 	void Send(DataBlock *block);
 	void Send(DataBlock *blocks[], LNE_UINT count);
 	void Shutdown(void);
-	SockSprayHander *get_hander(void);
-	void *get_context(void);
+
+	// WARNING: only used for LNE
+	SockSprayHandler *handler(void);
+
+protected:
+	bool IdleTimeout(void);
+	void HandleRead(void);
+	void HandleWrite(void);
+	void HandleShutdown(void);
+	bool HandleBind(SockPoller *binder);
+	void HandleTerminate(void);
+	void HandleIdleTimeout(void);
 
 private:
-	SockSpray(SockFactory *factory);
+	SockSpray(SockEventerPool *pool);
 	~SockSpray(void);
 	void Clean(void);
 	void __Shutdown(void);
-	void HandleWrite(void);
-	void __HandleWrite(void);
-	void HandleRead(void);
 	void __HandleRead(void);
-	void HandleShutdown(void);
+	void __HandleWrite(void);
 	void __HandleShutdown(void);
 	void EnterThreadSafe(void);
 	void LeaveThreadSafe(void);
 
+	bool enable_idle_check_;
 	DataBlockPool *pool_;
 	LNE_UINT limit_write_cache_;
-	SockSprayHander *hander_;
-	void *context_;
-	ThreadLock lock_;
+	SockSprayHandler *handler_;
+	ThreadLock thread_lock_;
 	LNE_UINT thread_count_;
 	// for send
 	struct {
@@ -93,12 +99,12 @@ private:
 		bool already;
 	} shutdown_state_;
 	ThreadLock shutdown_lock_;
-	POLLER poller_;
 #if defined(LNE_WIN32)
 	struct {
 		LNE_INT count;
 		WSABUF buffer;
-		IOCP_OVERLAPPED overlap[3];
+		IOCP_OVERLAPPED overlap[IOCP_ARRAY_MAX];
+		LPFN_DISCONNECTEX disconnectex;
 	} iocp_data_;
 	ThreadLock iocp_lock_;
 #elif defined(LNE_LINUX)
@@ -111,22 +117,36 @@ private:
 #endif
 };
 
-class LNE_Export SockSprayFactory : public SockFactory
+class LNE_Export SockSprayPool : public SockEventerPool
 {
 	friend class SockSpray;
+	static const LNE_UINT DEFAULT_WRITE_CACHE = 128;
 public:
-	static SockSprayFactory *NewInstance(DataBlockPool *pool, LNE_UINT limit_write_cache = 128, LNE_UINT limit_factroy_cache = SockFactory::DEFAULT_LIMIT_CACHE);
-	SockSpray *Alloc(SockPad sock, SockSprayHander *hander, void *context);
+	static SockSprayPool *NewInstance(DataBlockPool *data_pool, LNE_UINT limit_write_cache = DEFAULT_WRITE_CACHE, LNE_UINT limit_cache = SockEventerPool::DEFAULT_LIMIT_CACHE);
+	SockSpray *Alloc(SockPad skpad, SockSprayHandler *handler);
 
 private:
-	SockSprayFactory(LNE_UINT limit_factroy_cache);
-	~SockSprayFactory();
+	SockSprayPool(LNE_UINT limit_cache);
+	~SockSprayPool(void);
 
-	DataBlockPool *pool_;
+	DataBlockPool *data_pool_;
 	LNE_UINT limit_write_cache_;
 };
 
-#include "SockSpray.inl"
+LNE_INLINE SockSprayHandler *
+SockSpray::handler(void)
+{
+	return handler_;
+}
+
+LNE_INLINE
+SockSprayPool::SockSprayPool(LNE_UINT limit_cache)
+	: SockEventerPool(limit_cache)
+{
+	data_pool_ = NULL;
+	limit_write_cache_ = 0;
+}
+
 
 LNE_NAMESPACE_END
 

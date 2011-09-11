@@ -30,15 +30,6 @@ public:
 	virtual ~Abstract(void) = 0;
 };
 
-class LNE_Export NonCopyable
-{
-public:
-	NonCopyable(void);
-private:
-	NonCopyable(const NonCopyable &);
-	const NonCopyable &operator =(const NonCopyable &);
-};
-
 class LNE_Export Available
 {
 public:
@@ -51,7 +42,23 @@ private:
 	bool available_;
 };
 
-#include "BaseObject.inl"
+LNE_INLINE
+Available::operator bool(void) const
+{
+	return available_;
+}
+
+LNE_INLINE bool
+Available::IsAvailable(void) const
+{
+	return available_;
+}
+
+LNE_INLINE void
+Available::set_available(bool available)
+{
+	available_ = available;
+}
 
 LNE_NAMESPACE_END
 

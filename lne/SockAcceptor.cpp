@@ -22,27 +22,40 @@ LNE_NAMESPACE_USING
 
 SockAcceptor::SockAcceptor(void)
 {
-	socket_ = INVALID_SOCKET;
 	use_timeout_ = false;
 }
 
 SockAcceptor::~SockAcceptor(void)
 {
-	if(socket_ != INVALID_SOCKET)
-		closesocket(socket_);
+}
+
+LNE_UINT SockAcceptor::NewInstance(SockPad &skpad, const SockAddr &addr, LNE_UINT backlog)
+{
+	SOCKET sock = socket(addr.family(), SOCK_STREAM, IPPROTO_TCP);
+	if(sock != INVALID_SOCKET) {
+		int flag = 1;
+		if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&flag), sizeof(int)) == 0
+				&& bind(sock, addr.addr(), addr.size()) == 0
+				&& listen(sock, backlog) == 0) {
+			skpad.Attach(addr.family(), sock);
+			return LNERR_OK;
+		}
+		closesocket(sock);
+	}
+	return LNERR_UNKNOW;
 }
 
 SockAcceptor *SockAcceptor::NewInstance(const SockAddr &addr, LNE_UINT backlog, const TimeValue *tv)
 {
-	SOCKET sock = socket(addr.get_family(), SOCK_STREAM, IPPROTO_TCP);
+	SOCKET sock = socket(addr.family(), SOCK_STREAM, IPPROTO_TCP);
 	if(sock != INVALID_SOCKET) {
 		int flag = 1;
 		if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char *>(&flag), sizeof(int)) == 0
-				&& bind(sock, addr.get_addr(), addr.get_size()) == 0
+				&& bind(sock, addr.addr(), addr.size()) == 0
 				&& listen(sock, backlog) == 0) {
 			try {
 				SockAcceptor *acceptor = new SockAcceptor();
-				acceptor->socket_ = sock;
+				acceptor->skpad_.Attach(addr.family(), sock);
 				if(tv) {
 					acceptor->use_timeout_ = true;
 					acceptor->timeout_ = *tv;
@@ -61,17 +74,17 @@ void SockAcceptor::Release(void)
 	delete this;
 }
 
-LNE_UINT SockAcceptor::Accept(SockPad &sock, const TimeValue *tv)
+LNE_UINT SockAcceptor::Accept(SockPad &skpad, const TimeValue *tv)
 {
-	LNE_ASSERT_RETURN(socket_ != INVALID_SOCKET, LNERR_PARAMETER);
+	LNE_ASSERT_RETURN(skpad_, LNERR_PARAMETER);
 	if(tv) {
 		fd_set fds;
 		FD_ZERO(&fds);
-		FD_SET(socket_, &fds);
+		FD_SET(skpad_.socket(), &fds);
 		TimeValue timeout(*tv);
-		if(select(static_cast<int>(socket_ + 1), &fds, NULL, NULL, (timeval *)timeout) < 1)
+		if(select(static_cast<int>(skpad_.socket() + 1), &fds, NULL, NULL, (timeval *)timeout) < 1)
 			return LNERR_TIMEOUT;
 	}
-	sock = accept(socket_, NULL, NULL);
-	return sock ? LNERR_OK : LNERR_UNKNOW;
+	skpad.Attach(skpad_.family(), accept(skpad_.socket(), NULL, NULL));
+	return skpad ? LNERR_OK : LNERR_UNKNOW;
 }

@@ -19,7 +19,7 @@
 #ifndef LNE_SOCKPAD_H
 #define LNE_SOCKPAD_H
 
-#include "BaseObject.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 
@@ -28,20 +28,86 @@ class SockPad
 public:
 	SockPad(void);
 	~SockPad(void);
-	SockPad(SockPad& other);
-	SockPad& operator = (SockPad& other);
-	SockPad& operator = (SOCKET sock);
+	SockPad(SockPad &other);
+	SockPad &operator = (SockPad &other);
 
 	operator bool(void);
-	operator SOCKET(void);
-	void Attach(SOCKET sock);
-	SOCKET Detach();
+	int family();
+	SOCKET socket();
+	void Attach(int family, SOCKET sock);
+	void Close();
 
 private:
+	int family_;
 	SOCKET socket_;
 };
 
-#include "SockPad.inl"
+LNE_INLINE
+SockPad::SockPad(void)
+{
+	family_ = AF_UNSPEC;
+	socket_ = INVALID_SOCKET;
+}
+
+LNE_INLINE
+SockPad::~SockPad(void)
+{
+	Close();
+}
+
+LNE_INLINE
+SockPad::SockPad(SockPad &other)
+{
+	family_ = AF_UNSPEC;
+	socket_ = INVALID_SOCKET;
+	operator=(other);
+}
+
+LNE_INLINE SockPad &
+SockPad::operator = (SockPad &other)
+{
+	Attach(other.family_, other.socket_);
+	other.family_ = AF_UNSPEC;
+	other.socket_ = INVALID_SOCKET;
+	return *this;
+}
+
+LNE_INLINE
+SockPad::operator bool(void)
+{
+	return socket_ != INVALID_SOCKET;
+}
+
+LNE_INLINE int
+SockPad::family()
+{
+	return family_;
+}
+
+LNE_INLINE SOCKET
+SockPad::socket()
+{
+	return socket_;
+}
+
+LNE_INLINE void
+SockPad::Attach(int family, SOCKET sock)
+{
+	if(socket_ != INVALID_SOCKET)
+		closesocket(socket_);
+	family_ = family;
+	socket_ = sock;
+}
+
+LNE_INLINE void
+SockPad::Close()
+{
+	family_ = AF_UNSPEC;
+	if(socket_ != INVALID_SOCKET) {
+		closesocket(socket_);
+		socket_ = INVALID_SOCKET;
+	}
+}
 
 LNE_NAMESPACE_END
 

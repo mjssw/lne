@@ -19,22 +19,24 @@
 #ifndef LNE_THREADCONDITION_H
 #define LNE_THREADCONDITION_H
 
-#include "BaseObject.h"
 #include "TimeValue.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadCondition: public Available, public NonCopyable
+class LNE_Export ThreadCondition: public Available
 {
 public:
 	ThreadCondition(void);
 	~ThreadCondition(void);
-
 	LNE_UINT Wait(void);
 	LNE_UINT Wait(const TimeValue &tv);;
 	LNE_UINT Signal(void);
 
 private:
+	ThreadCondition(const ThreadCondition &);
+	ThreadCondition &operator=(const ThreadCondition &);
+
 #if defined(LNE_WIN32)
 	HANDLE event_;
 #else
@@ -44,7 +46,47 @@ private:
 #endif
 };
 
-#include "ThreadCondition.inl"
+LNE_INLINE LNE_UINT
+ThreadCondition::Wait(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(event_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	int ret = LNERR_UNKNOW;
+	if(pthread_mutex_lock(&mutex_) == 0) {
+		if(signal_ || pthread_cond_wait(&cond_, &mutex_) == 0) {
+			signal_ = false;
+			ret = LNERR_OK;
+		}
+		pthread_mutex_unlock(&mutex_);
+	}
+	return ret;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadCondition::Signal(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return SetEvent(event_) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	int ret = LNERR_UNKNOW;
+	if(pthread_mutex_lock(&mutex_) == 0) {
+		if(signal_)
+			ret = LNERR_OK;
+		else if(pthread_cond_signal(&cond_) == 0) {
+			signal_ = true;
+			ret = LNERR_OK;
+		}
+		pthread_mutex_unlock(&mutex_);
+	}
+	return ret;
+#endif
+}
 
 LNE_NAMESPACE_END
 

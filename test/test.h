@@ -1,7 +1,6 @@
 #ifndef TEST_H
 #define TEST_H
 
-#include <lne/lne.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>

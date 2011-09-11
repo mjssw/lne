@@ -19,23 +19,25 @@
 #ifndef LNE_THREADMUTEX_H
 #define LNE_THREADMUTEX_H
 
-#include "BaseObject.h"
 #include "TimeValue.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadMutex: public Available,public NonCopyable
+class LNE_Export ThreadMutex: public Available
 {
 public:
 	ThreadMutex(void);
 	~ThreadMutex(void);
-
 	LNE_UINT TryAcquire(void);
 	LNE_UINT Acquire(void);
-	LNE_UINT Acquire(const TimeValue& tv);;
+	LNE_UINT Acquire(const TimeValue &tv);;
 	LNE_UINT Release(void);
 
 private:
+	ThreadMutex(const ThreadMutex &);
+	ThreadMutex &operator=(const ThreadMutex &);
+
 #if defined(LNE_WIN32)
 	HANDLE mutex_;
 #else
@@ -43,7 +45,41 @@ private:
 #endif
 };
 
-#include "ThreadMutex.inl"
+LNE_INLINE LNE_UINT
+ThreadMutex::TryAcquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(mutex_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
+#else
+	return pthread_mutex_trylock(&mutex_) == 0 ? LNERR_OK : LNERR_TIMEOUT;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadMutex::Acquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(mutex_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return pthread_mutex_lock(&mutex_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadMutex::Release(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return ReleaseMutex(mutex_) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return pthread_mutex_unlock(&mutex_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
 
 LNE_NAMESPACE_END
 

@@ -19,23 +19,25 @@
 #ifndef LNE_THREADSEMAPHORE_H
 #define LNE_THREADSEMAPHORE_H
 
-#include "BaseObject.h"
 #include "TimeValue.h"
+#include "BaseObject.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadSemaphore: public Available,public NonCopyable
+class LNE_Export ThreadSemaphore: public Available
 {
 public:
 	ThreadSemaphore(LNE_UINT count = 1, LNE_UINT max = 0x7FFFFFFF);
 	~ThreadSemaphore(void);
-
 	LNE_UINT TryAcquire(void);
 	LNE_UINT Acquire(void);
 	LNE_UINT Acquire(const TimeValue &tv);
 	LNE_UINT Release(void);
 
 private:
+	ThreadSemaphore(const ThreadSemaphore &);
+	ThreadSemaphore &operator=(const ThreadSemaphore &);
+
 #if defined(LNE_WIN32)
 	HANDLE sem_;
 #else
@@ -43,7 +45,41 @@ private:
 #endif
 };
 
-#include "ThreadSemaphore.inl"
+LNE_INLINE LNE_UINT
+ThreadSemaphore::TryAcquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(sem_, 0) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_TIMEOUT;
+#else
+	return sem_trywait(&sem_) == 0 ? LNERR_OK : LNERR_TIMEOUT;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadSemaphore::Acquire(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return WaitForSingleObject(sem_, INFINITE) == WAIT_OBJECT_0 ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return sem_wait(&sem_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
+
+LNE_INLINE LNE_UINT
+ThreadSemaphore::Release(void)
+{
+	if(!IsAvailable())
+		return LNERR_NOINIT;
+#if defined(LNE_WIN32)
+	return ReleaseSemaphore(sem_, 1, NULL) ? LNERR_OK : LNERR_UNKNOW;
+#else
+	return sem_post(&sem_) == 0 ? LNERR_OK : LNERR_UNKNOW;
+#endif
+}
 
 LNE_NAMESPACE_END
 

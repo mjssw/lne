@@ -72,7 +72,6 @@ SockAddr::SockAddr(const SockAddr &other)
 
 SockAddr &SockAddr::operator =(const SockAddr &other)
 {
-	family_ = other.family_;
 	size_ = other.size_;
 	memcpy(&addr_, &other.addr_, sizeof(addr_));
 	memcpy(addr_text_, other.addr_text_, sizeof(addr_text_));
@@ -85,7 +84,6 @@ LNE_UINT SockAddr::Set(LNE_UINT16 port, int address_family)
 		memset(&addr_.in4, 0, sizeof(addr_.in4));
 		addr_.in4.sin_family = AF_INET;
 		addr_.in4.sin_port = htons(port);
-		family_ = AF_INET;
 		size_ = sizeof(addr_.in4);
 		return LNERR_OK;
 	}
@@ -93,7 +91,6 @@ LNE_UINT SockAddr::Set(LNE_UINT16 port, int address_family)
 		memset(&addr_.in6, 0, sizeof(addr_.in6));
 		addr_.in6.sin6_family = AF_INET6;
 		addr_.in6.sin6_port = htons(port);
-		family_ = AF_INET6;
 		size_ = sizeof(addr_.in6);
 		return LNERR_OK;
 	}
@@ -182,22 +179,34 @@ LNE_UINT SockAddr::Set(LNE_UINT16 port, const char *address, int address_family)
 
 void SockAddr::Reset()
 {
-	family_ = AF_UNSPEC;
 	size_ = 0;
 	memset(&addr_, 0, sizeof(addr_));
 	memset(addr_text_, 0, sizeof(addr_text_));
 }
 
-LNE_UINT SockAddr::Set(const sockaddr *addr, int len)
+LNE_UINT SockAddr::Set(const sockaddr *addr, socklen_t len)
 {
 	if(addr == NULL || len <= 0)
 		return LNERR_PARAMETER;
 	if(addr->sa_family == AF_INET) {
 		if(len < (int)sizeof(sockaddr_in))
 			return LNERR_PARAMETER;
-		family_ = AF_INET;
 		size_ = len;
 		memcpy(&addr_.in4, addr, len);
+	} else if(addr->sa_family == AF_INET6) {
+		if(len < (socklen_t)sizeof(sockaddr_in6))
+			return LNERR_PARAMETER;
+		size_ = len;
+		memcpy(&addr_.in6, addr, len);;
+	} else
+		return LNERR_NOSUPPORT;
+	generate_addr_text();
+	return LNERR_OK;
+}
+
+void SockAddr::generate_addr_text(void)
+{
+	if(addr_.sa.sa_family == AF_INET) {
 #if defined(LNE_WIN32)
 		DWORD out_len = sizeof(addr_text_);
 		WSAAddressToStringA((LPSOCKADDR)&addr_.in4, sizeof(addr_.in4), NULL, addr_text_, &out_len);
@@ -205,13 +214,7 @@ LNE_UINT SockAddr::Set(const sockaddr *addr, int len)
 		if(inet_ntop(AF_INET, &addr_.in4.sin_addr, addr_text_, sizeof(addr_text_)))
 			sprintf(addr_text_ + strlen(addr_text_), ":%u", ntohs(addr_.in4.sin_port));
 #endif
-		return LNERR_OK;
-	} else if(addr->sa_family == AF_INET6) {
-		if(len < (int)sizeof(sockaddr_in6))
-			return LNERR_PARAMETER;
-		family_ = AF_INET6;
-		size_ = len;
-		memcpy(&addr_.in6, addr, len);
+	} else if(addr_.sa.sa_family == AF_INET6) {
 #if defined(LNE_WIN32)
 		DWORD out_len = sizeof(addr_text_);
 		WSAAddressToStringA((LPSOCKADDR)&addr_.in6, sizeof(addr_.in6), NULL, addr_text_, &out_len);
@@ -219,7 +222,5 @@ LNE_UINT SockAddr::Set(const sockaddr *addr, int len)
 		if(inet_ntop(AF_INET6, &addr_.in6.sin6_addr, addr_text_, sizeof(addr_text_)))
 			sprintf(addr_text_ + strlen(addr_text_), ":%u", ntohs(addr_.in6.sin6_port));
 #endif
-		return LNERR_OK;
 	}
-	return LNERR_NOSUPPORT;
 }

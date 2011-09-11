@@ -31,16 +31,89 @@ public:
 	void Release(void);
 
 protected:
-	RefObject(void);
+	RefObject(bool fast_mode = true);
+	void Lock(void);
+	void Unlock(void);
 	void SetRef(LNE_UINT ref);
-	virtual void ObjectDestroy() = 0;
+	virtual void ObjectDestroy(void) = 0;
 
 private:
 	ThreadLock lock_;
 	LNE_UINT reference_;
 };
 
-#include "ExtendObject.inl"
+template<typename T>
+class AutoRelease
+{
+public:
+	AutoRelease(T *t);
+	~AutoRelease(void);
+	operator bool(void);
+	T *operator ->(void);
+	operator T *(void);
+
+private:
+	T *t_;
+};
+
+LNE_INLINE void
+RefObject::AddRef(void)
+{
+	lock_.Lock();
+	++reference_;
+	lock_.Unlock();
+}
+
+LNE_INLINE void
+RefObject::SetRef(LNE_UINT ref)
+{
+	lock_.Lock();
+	reference_ = ref;
+	lock_.Unlock();
+}
+
+LNE_INLINE void
+RefObject::Lock(void)
+{
+	lock_.Lock();
+}
+
+LNE_INLINE void
+RefObject::Unlock(void)
+{
+	lock_.Unlock();
+}
+
+template<typename T>
+AutoRelease<T>::AutoRelease(T *t)
+{
+	t_ = t;
+}
+
+template<typename T>
+AutoRelease<T>::~AutoRelease(void)
+{
+	if(t_)
+		t_->Release();
+}
+
+template<typename T>
+AutoRelease<T>::operator bool(void)
+{
+	return t_ != NULL;
+}
+
+template<typename T>
+T *AutoRelease<T>::operator ->(void)
+{
+	return t_;
+}
+
+template<typename T>
+AutoRelease<T>::operator T *(void)
+{
+	return t_;
+}
 
 LNE_NAMESPACE_END
 

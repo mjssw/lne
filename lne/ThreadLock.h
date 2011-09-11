@@ -19,23 +19,25 @@
 #ifndef LNE_THREADLOCK_H
 #define LNE_THREADLOCK_H
 
-#include "BaseObject.h"
+#include "config.h"
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export ThreadLock: public NonCopyable
+class LNE_Export ThreadLock
 {
 public:
 	ThreadLock(bool fast_mode = false);
 	~ThreadLock();
-
 	void Lock(void);
 	void Unlock(void);
 
 private:
+	ThreadLock(const ThreadLock &);
+	ThreadLock &operator=(const ThreadLock &);
 #if !defined(LNE_WIN32)
 	static int pthread_mutex_spinlock(pthread_mutex_t *mutex, int spin_count);
 #endif
+
 #if defined(LNE_WIN32)
 	CRITICAL_SECTION lock_;
 #else
@@ -44,7 +46,49 @@ private:
 #endif
 };
 
-#include "ThreadLock.inl"
+LNE_INLINE
+ThreadLock::ThreadLock(bool fast_mode)
+{
+#if defined(LNE_WIN32)
+	InitializeCriticalSectionAndSpinCount(&lock_, fast_mode ? 4000 : 0);
+#else
+	pthread_mutex_init(&lock_, NULL);
+	spin_count_ = fast_mode ? 4000 : 0;
+#endif
+}
+
+LNE_INLINE
+ThreadLock::~ThreadLock(void)
+{
+#if defined(LNE_WIN32)
+	DeleteCriticalSection(&lock_);
+#else
+	pthread_mutex_destroy(&lock_);
+#endif
+}
+
+LNE_INLINE void
+ThreadLock::Lock(void)
+{
+#if defined(LNE_WIN32)
+	EnterCriticalSection(&lock_);
+#else
+	if(spin_count_ > 0)
+		pthread_mutex_spinlock(&lock_, spin_count_);
+	else
+		pthread_mutex_lock(&lock_);
+#endif
+}
+
+LNE_INLINE void
+ThreadLock::Unlock(void)
+{
+#if defined(LNE_WIN32)
+	LeaveCriticalSection(&lock_);
+#else
+	pthread_mutex_unlock(&lock_);
+#endif
+}
 
 LNE_NAMESPACE_END
 

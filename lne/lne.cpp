@@ -16,9 +16,10 @@
  *  along with LNE.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lne.h"
+#include "config.h"
 
 #if defined(LNE_WIN32)
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 {
 	switch(fdwReason) {
@@ -34,4 +35,5 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
 #endif

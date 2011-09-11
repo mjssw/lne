@@ -20,8 +20,8 @@
 
 LNE_NAMESPACE_USING
 
-RefObject::RefObject(void)
-	: lock_(true), reference_(1)
+RefObject::RefObject(bool fast_mode)
+	: lock_(fast_mode), reference_(1)
 {
 }
 

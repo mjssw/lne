@@ -24,37 +24,56 @@
 
 LNE_NAMESPACE_BEGIN
 
-class LNE_Export Runnable :public Abstract{
+class LNE_Export Runnable : public Abstract
+{
 public:
 	virtual void Service(void) = 0;
 	virtual void Terminate(void) = 0;
 };
 
-class LNE_Export Thread: public Available, public NonCopyable
+class LNE_Export Thread: public Available
 {
 public:
-	static Thread* NewInstance(Runnable* run);
+	static Thread *NewInstance(Runnable *run);
 	void Release(void);
 	LNE_UINT Active(void);
 	LNE_UINT Wait(void);
 	static void Sleep(LNE_UINT64 msec);
-	static void Sleep(const TimeValue& tv);
+	static void Sleep(const TimeValue &tv);
 
 private:
-	Thread(Runnable* run);
+	Thread(Runnable *run);
 	~Thread(void);
 
-	Runnable* run_;
+	Runnable *run_;
 #if defined(LNE_WIN32)
 	HANDLE handle_;
 	static DWORD WINAPI ThreadRoutine(LPVOID parameter);
 #else
 	pthread_t thread_;
-	static void* ThreadRoutine(void* parameter);
+	static void *ThreadRoutine(void *parameter);
 #endif
 };
 
-#include "Thread.inl"
+LNE_INLINE void
+Thread::Sleep(LNE_UINT64 msec)
+{
+#if defined(LNE_WIN32)
+	::Sleep((DWORD)msec);
+#else
+	::usleep(msec * 1000);
+#endif
+}
+
+LNE_INLINE void
+Thread::Sleep(const TimeValue &tv)
+{
+#if defined(LNE_WIN32)
+	::Sleep((DWORD)tv.ToMillisecond());
+#else
+	::usleep(tv.ToMicroseconds());
+#endif
+}
 
 LNE_NAMESPACE_END
 

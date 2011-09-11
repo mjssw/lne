@@ -13,10 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Inline Files">
-      <UniqueIdentifier>{0c626331-4ef8-4215-880e-87f006d61f5a}</UniqueIdentifier>
-      <Extensions>inl</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config-win32.h">
@@ -35,9 +31,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ThreadPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lne.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="config.h">
@@ -61,9 +54,6 @@
     <ClInclude Include="SockAcceptor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DataBlockPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SockConnector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -82,7 +72,7 @@
     <ClInclude Include="SockSpray.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SockPoller.h">
+    <ClInclude Include="SockReactor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SockEventer.h">
@@ -94,7 +84,7 @@
     <ClInclude Include="ExtendObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SockObject.h">
+    <ClInclude Include="SockSpring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,9 +122,6 @@
     <ClCompile Include="SockAcceptor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DataBlockPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SockConnector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -144,7 +131,7 @@
     <ClCompile Include="SockSpray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SockPoller.cpp">
+    <ClCompile Include="SockReactor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SockEventer.cpp">
@@ -156,76 +143,8 @@
     <ClCompile Include="ExtendObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SockObject.cpp">
+    <ClCompile Include="SockSpring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ThreadMutex.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ThreadSemaphore.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="TimeValue.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="Thread.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ThreadCondition.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="DataBlock.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockWaves.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockAddr.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockAcceptor.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="DataBlockPool.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockConnector.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockStream.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ObjectList_T.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ObjectQueue_T.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ObjectStack_T.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockSpray.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockPoller.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ThreadPool.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockEventer.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="BaseObject.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="ExtendObject.inl">
-      <Filter>Inline Files</Filter>
-    </None>
-    <None Include="SockObject.inl">
-      <Filter>Inline Files</Filter>
-    </None>
   </ItemGroup>
 </Project>
