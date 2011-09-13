@@ -141,14 +141,14 @@ void SockSpring::__HandleRead(void)
 #else
 	SOCKET sock;
 	do {
-		Lock();
+		RefLock();
 		if(skpad_)
 			sock = accept(skpad_.socket(), NULL, NULL);
 		else {
 			sock = SOCKET_ERROR;
 			errno = EBADF;
 		}
-		Unlock();
+		RefUnlock();
 		if(sock != SOCKET_ERROR) {
 			skpad.Attach(skpad_.family(), sock);
 			handler_->HandleClient(this, skpad);
