@@ -32,8 +32,8 @@ public:
 
 protected:
 	RefObject(bool fast_mode = true);
-	void Lock(void);
-	void Unlock(void);
+	void RefLock(void);
+	void RefUnlock(void);
 	void SetRef(LNE_UINT ref);
 	virtual void ObjectDestroy(void) = 0;
 
@@ -73,13 +73,13 @@ RefObject::SetRef(LNE_UINT ref)
 }
 
 LNE_INLINE void
-RefObject::Lock(void)
+RefObject::RefLock(void)
 {
 	lock_.Lock();
 }
 
 LNE_INLINE void
-RefObject::Unlock(void)
+RefObject::RefUnlock(void)
 {
 	lock_.Unlock();
 }

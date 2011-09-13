@@ -56,10 +56,10 @@ void SockSpring::Clean(void)
 
 void SockSpring::Shutdown(void)
 {
-	Lock();
+	RefLock();
 	if(!shutdown_already_)
 		__Shutdown();
-	Unlock();
+	RefUnlock();
 	poller()->UnBind(this);
 }
 
@@ -117,10 +117,10 @@ void SockSpring::HandleRead(void)
 void SockSpring::__HandleRead(void)
 {
 	bool to_handle = true;
-	Lock();
+	RefLock();
 	if(shutdown_already_)
 		to_handle = false;
-	Unlock();
+	RefUnlock();
 	if(!to_handle)
 		return;
 	SockPad skpad;
