@@ -71,20 +71,20 @@ SockEventerPool::~SockEventerPool(void)
 
 void SockEventerPool::PushObject(SockEventer *object)
 {
-	Lock();
+	RefLock();
 	if(objects_.count() > limit_cache_ || objects_.Push(object) != LNERR_OK)
 		delete object;
-	Unlock();
+	RefUnlock();
 	Release();
 }
 
 SockEventer *SockEventerPool::PopObject(void)
 {
 	SockEventer *object;
-	Lock();
+	RefLock();
 	if(objects_.Pop(object) != LNERR_OK)
 		object = NULL;
-	Unlock();
+	RefUnlock();
 	if(object)
 		AddRef();
 	return object;

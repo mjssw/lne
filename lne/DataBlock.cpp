@@ -114,20 +114,20 @@ void DataBlockPool::ObjectDestroy(void)
 
 void DataBlockPool::Free(DataBlock *block)
 {
-	Lock();
+	RefLock();
 	BlockQueue *queue = queue_free_;
 	queue_free_ = queue->next;
 	queue->block = block;
 	queue->next = queue_head_;
 	queue_head_ = queue;
-	Unlock();
+	RefUnlock();
 	Release();
 }
 
 DataBlock *DataBlockPool::Alloc(void)
 {
 	DataBlock *result = NULL;
-	Lock();
+	RefLock();
 	if(queue_head_ == NULL) {
 		char *buffer = static_cast<char *>(malloc(sizeof(BlockCache) + sizeof(BlockQueue) * cache_blocks_ + (sizeof(DataBlock) + capacity_) * cache_blocks_));
 		if(buffer)
@@ -141,7 +141,7 @@ DataBlock *DataBlockPool::Alloc(void)
 		queue->next = queue_free_;
 		queue_free_ = queue;
 	}
-	Unlock();
+	RefUnlock();
 	if(result)
 		AddRef();
 	return result;
